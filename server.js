@@ -1,21 +1,22 @@
-// Importamos Express
+// Importamos dependencias
 const express = require('express');
+const path = require('path');
 
 // Creamos la app
 const app = express();
 
-// Definimos el puerto (puedes cambiarlo si quieres)
-const PORT = 3000;
+// Configuramos el puerto
+const PORT = process.env.PORT || 3000;
 
-// Middleware para servir los archivos estáticos (tu carpeta vista)
-app.use(express.static('vista'));
+// Middleware para servir archivos estáticos (CSS, JS, imágenes)
+app.use(express.static(path.join(__dirname, 'vista')));
 
-// Ruta principal (solo para probar que funciona)
+// Ruta principal
 app.get('/', (req, res) => {
-  res.send('Servidor funcionando correctamente 🚀');
+  res.sendFile(path.join(__dirname, 'vista', 'index.html'));
 });
 
 // Iniciamos el servidor
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
