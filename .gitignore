@@ -1,0 +1,8 @@
+# Ignorar dependencias
+node_modules/
+
+# Archivos del entorno (por si más adelante usas variables)
+.env
+
+# Archivos temporales
+*.log
