@@ -1,87 +1,119 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-     <link rel="icon" type="image/x-icon" href="img/ucvitoFut.ico">
-    <link rel="stylesheet" href="css/login.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="icon" type="image/x-icon" href="img/ucvitoFut.ico">
+  <link rel="stylesheet" href="css/login.css">
 </head>
-
 <body>
-    <div class="container" id="container">
-        <div class="form-container sign-up-container">
-            <form action="#">
-                <div class="logo">
-                  <img src="https://cdn.dribbble.com/users/2370289/screenshots/6233741/untitled-1.gif" alt="Logo">
-                    <h1>Medisalud</h1>
-                </div>
-                <div class="input-box">
-                    <input type="text" name="usuario" placeholder="Usuario" required>
-                    <label></label>
-                </div>
-                <div class="input-box">
-                    <input type="text"name="nombres" placeholder="Nombres" required>
-                    <label></label>
-                </div>
-                <div class="input-box">
-                    <input type="text" name="apellidos" placeholder="Apellidos" required>
-                    <label></label>
-                </div>
-                <div class="input-box">
-                    <input type="email" name="correo" placeholder="Correo electrónico" required>
-                    <label></label>
-                </div>
-                <div class="input-box">
-                    <input type="password" name="contra" placeholder="Contraseña" required>
-                    <label></label>
-                </div>
-                <div class="input-box">
-                    <input type="password" name="confirmar" placeholder="Confirmar Contraseña" required>
-                    <label></label>
-                </div>
+  <div class="container" id="container">
+    <!-- ========== REGISTRO ========== -->
+    <div class="form-container sign-up-container">
+      <form action="#" method="post" autocomplete="on">
+        <div class="logo">
+          <img src="https://cdn.dribbble.com/users/2370289/screenshots/6233741/untitled-1.gif" alt="Logo">
+          <h1>Medisalud</h1>
+        </div>
 
-                <button>Registrarse</button>
-            </form>
+        <!-- DNI en vez de usuario -->
+        <div class="input-box">
+          <input
+            type="text"
+            name="dni"
+            placeholder="DNI (8 dígitos)"
+            required
+            pattern="^\d{8}$"
+            maxlength="8"
+            inputmode="numeric"
+            autocomplete="username"
+            oninput="this.value=this.value.replace(/\D/g,'').slice(0,8)"
+          >
+          <label></label>
         </div>
-        <div class="form-container sign-in-container">
-            <form action="#">
-                <div class="logo">
-                    <img src="https://cdn.dribbble.com/users/2370289/screenshots/6233741/untitled-1.gif" alt="Logo">
-                    <h1>Medisalud</h1>
-                </div>
-                <div class="input-box">
-                    <input type="text" name="email" placeholder="Nombre de Usuario" required>
-                    <label></label>
-                </div>
-                <div class="input-box">
-                  <input type="password" id="login-password" name="password" placeholder="Contraseña" required>
-                    <label></label>
-                </div>
-                <a href="../Controlador/recuperar_psw.php" class="forgot">¿Olvidaste tu Contraseña?</a>
-                <button>Iniciar Sesión</button>
-            </form>
+
+        <div class="input-box">
+          <input type="text" name="nombres" placeholder="Nombres" required>
+          <label></label>
         </div>
-        <div class="overlay-container" id="overlayCon">
-            <div class="overlay">
-                <div class="overlay-panel overlay-left">
-                    <h1>¡Bienvenido!</h1>
-                    <p>Si ya cuenta con una cuenta, inicie sesión con sus datos</p>
-                    <button>Iniciar Sesión</button>
-                </div>
-                <div class="overlay-panel overlay-right">
-                    <h1>¡Bienvenido!</h1>
-                    <p>Si aún no se ha registrado, ¿Qué espera? ¡Disfrute de Medisalud ya!</p>
-                    <button>Registrate</button>
-                </div>
-            </div>
-            <button id="overlayBtn"></button>
+
+        <div class="input-box">
+          <input type="text" name="apellidos" placeholder="Apellidos" required>
+          <label></label>
         </div>
+
+        <div class="input-box">
+          <input type="email" name="correo" placeholder="Correo electrónico" required autocomplete="email">
+          <label></label>
+        </div>
+
+        <div class="input-box">
+          <input type="password" name="contra" id="reg-password" placeholder="Contraseña" required autocomplete="new-password" minlength="8">
+          <label></label>
+        </div>
+
+        <!-- Arreglo: este campo estaba fuera de su .input-box -->
+        <div class="input-box">
+          <input type="password" name="confirmar" id="reg-password-confirm" placeholder="Confirme su Contraseña" required autocomplete="new-password" minlength="8">
+          <label></label>
+        </div>
+
+        <button type="submit">Registrarse</button>
+      </form>
     </div>
-<script src="js/AdminLoginScript.js"></script>
 
+    <!-- ========== INICIO DE SESIÓN ========== -->
+    <div class="form-container sign-in-container">
+      <form action="#" method="post" autocomplete="on">
+        <div class="logo">
+          <img src="https://cdn.dribbble.com/users/2370289/screenshots/6233741/untitled-1.gif" alt="Logo">
+          <h1>Medisalud</h1>
+        </div>
 
+        <!-- DNI en vez de nombre de usuario -->
+        <div class="input-box">
+          <input
+            type="text"
+            name="dni"
+            placeholder="DNI (8 dígitos)"
+            required
+            pattern="^\d{8}$"
+            maxlength="8"
+            inputmode="numeric"
+            autocomplete="username"
+            oninput="this.value=this.value.replace(/\D/g,'').slice(0,8)"
+          >
+          <label></label>
+        </div>
+
+        <div class="input-box">
+          <input type="password" id="login-password" name="password" placeholder="Contraseña" required autocomplete="current-password" minlength="8">
+          <label></label>
+        </div>
+
+        <button type="submit">Iniciar Sesión</button>
+      </form>
+    </div>
+
+    <!-- ========== OVERLAY ========== -->
+    <div class="overlay-container" id="overlayCon">
+      <div class="overlay">
+        <div class="overlay-panel overlay-left">
+          <h1>¡Bienvenido!</h1>
+          <p>Si ya cuenta con una cuenta, inicie sesión con sus datos</p>
+          <button type="button">Iniciar Sesión</button>
+        </div>
+        <div class="overlay-panel overlay-right">
+          <h1>¡Bienvenido!</h1>
+          <p>Si aún no se ha registrado, ¿Qué espera? ¡Disfrute de Medisalud ya!</p>
+          <button type="button">Regístrate</button>
+        </div>
+      </div>
+      <button id="overlayBtn" type="button"></button>
+    </div>
+  </div>
+
+  <script src="js/AdminLoginScript.js"></script>
 </body>
-
 </html>
