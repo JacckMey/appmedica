@@ -1,22 +1,25 @@
-// Importamos dependencias
 const express = require('express');
 const path = require('path');
 
-// Creamos la app
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Configuramos el puerto
-const PORT = process.env.PORT || 3000;
+// Logger para ver qué llega
+app.use((req, _res, next) => {
+  console.log('>>', req.method, req.url);
+  next();
+});
 
-// Middleware para servir archivos estáticos (CSS, JS, imágenes)
 app.use(express.static(path.join(__dirname, 'vista')));
 
-// Ruta principal
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'vista', 'index.html'));
 });
 
-// Iniciamos el servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-});
+// Monta el router EN RAÍZ explícitamente
+const usuarioRouter = require('./controlador/usuario.controller');
+app.use('/', usuarioRouter);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 http://localhost:${PORT}`));
