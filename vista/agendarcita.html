@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cita Eficiente</title>
+    <link rel="stylesheet" href="css/agendarcita.css"> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<header>
+    <div class="header-left">
+        <div class="logo">Cita Eficiente</div>
+        <div class="numeros">
+            <span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>4</span><span>6</span>
+        </div>
+    </div>
+    <nav>
+        <a href="#inicio">INICIO</a>
+        <a href="#formulario">FORMULARIO</a>
+        <a href="#servicios">SERVICIOS</a>
+    </nav>
+</header>
+    
+<section class="hero" id="inicio">
+    <div class="overlay">
+        <h2>Agendar cita</h2>
+        <p>¿Necesitas atención médica? Agenda tu cita con nosotros de forma rápida y sencilla.</p>
+        <button class="btn-blue" id="btnAgendar">Agendar</button>
+    </div>
+</section>
+
+<section class="basic-services" id="servicios">
+    <h2>Servicios básicos</h2>
+    <div class="services-container">
+        <div class="service-card">
+            <h3>Citas médicas</h3>
+            <p>Brindamos atención médica personalizada con especialistas capacitados.</p>
+        </div>
+        <div class="service-card">
+            <h3>Medicamentos</h3>
+            <p>Ofrecemos recetas electrónicas y medicamentos de calidad.</p>
+        </div>
+        <div class="service-card">
+            <h3>Exámenes médicos</h3>
+            <p>Accede a nuestros servicios de diagnóstico rápido y confiable.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FORMULARIO DE REGISTRO DE CITAS -->
+<section id="formulario" class="form-section">
+    <h2>Registrar Cita</h2>
+    <form id="formCita" class="cita-form">
+        <div class="form-columns">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="dni">DNI *</label>
+                    <input type="text" id="dni" name="dni" maxlength="8" pattern="[0-9]{8}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre">Nombre completo *</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">Teléfono *</label>
+                    <input type="tel" id="telefono" name="telefono" maxlength="9" pattern="[0-9]{9}" required>
+                </div>
+            </div>
+
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="especialidad">Especialidad *</label>
+                    <select id="especialidad" name="especialidad" required>
+                        <option value="">Selecciona una especialidad</option>
+                        <option value="cardiologia">Cardiología</option>
+                        <option value="medicina-general">Medicina General</option>
+                        <option value="pediatria">Pediatría</option>
+                        <option value="dermatologia">Dermatología</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha">Fecha de la cita *</label>
+                    <input type="date" id="fecha" name="fecha" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="hora">Hora *</label>
+                    <select id="hora" name="hora" required>
+                        <option value="">Selecciona un horario</option>
+                    </select>
+                    <small id="infoHorarios" style="color: #555; font-size: 13px;"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="motivo">Motivo de la consulta</label>
+                    <textarea id="motivo" name="motivo" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-submit">
+            <button type="submit" class="btn-blue">Registrar Cita</button>
+        </div>
+    </form>
+</section>
+
+<section class="newsletter">
+    <h2>Recibe nuestras últimas noticias</h2>
+    <p>Suscríbete para recibir novedades y consejos de salud.</p>
+    <form id="formNewsletter">
+        <input type="email" placeholder="Ingresa tu correo electrónico aquí" required>
+        <button type="submit" class="btn-blue">Suscribirte</button>
+    </form>
+</section>
+
+<footer>
+    <div>© 2025 Cita Eficiente</div>
+    <div>
+        <a href="#">Términos y Condiciones</a>
+        <a href="#">Política de Privacidad</a>
+    </div>
+</footer>
+
+<script>
+// Botón de scroll
+document.getElementById('btnAgendar').addEventListener('click', () => {
+    document.querySelector('#formulario').scrollIntoView({ behavior: 'smooth' });
+});
+
+// Fecha mínima = hoy
+const hoy = new Date().toISOString().split('T')[0];
+document.getElementById('fecha').setAttribute('min', hoy);
+
+// Horarios por especialidad
+const horariosPorEspecialidad = {
+    "cardiologia": ["08:00", "09:30", "11:00", "15:00"],
+    "medicina-general": ["09:00", "10:00", "13:00", "16:30"],
+    "pediatria": ["08:30", "10:30", "12:30", "14:00"],
+    "dermatologia": ["09:00", "10:15", "11:45", "17:00"]
+};
+
+// Ejemplo de horarios ocupados (normalmente vendrían de la BD)
+const citasOcupadas = {
+    "cardiologia": { "2025-10-25": ["09:30"], "2025-10-26": ["11:00"] },
+    "pediatria": { "2025-10-25": ["10:30"] }
+};
+
+function actualizarHorarios() {
+    const especialidad = document.getElementById("especialidad").value;
+    const fecha = document.getElementById("fecha").value;
+    const selectHora = document.getElementById("hora");
+    const info = document.getElementById("infoHorarios");
+
+    selectHora.innerHTML = '<option value="">Selecciona un horario</option>';
+    info.textContent = '';
+
+    if (!especialidad || !fecha) return;
+
+    const horarios = horariosPorEspecialidad[especialidad] || [];
+    const ocupadas = (citasOcupadas[especialidad] && citasOcupadas[especialidad][fecha]) || [];
+
+    if (horarios.length === 0) {
+        info.textContent = "No hay horarios disponibles para esta especialidad.";
+        return;
+    }
+
+    horarios.forEach(hora => {
+        const option = document.createElement("option");
+        option.value = hora;
+        option.textContent = hora + (ocupadas.includes(hora) ? " — Ocupado" : "");
+        if (ocupadas.includes(hora)) {
+            option.disabled = true;
+            option.style.color = "gray";
+        }
+        selectHora.appendChild(option);
+    });
+
+    const disponibles = horarios.length - ocupadas.length;
+    info.textContent = disponibles > 0
+        ? `Disponibles: ${disponibles} horario(s)`
+        : "No hay horarios disponibles para esta fecha.";
+}
+
+document.getElementById("especialidad").addEventListener("change", actualizarHorarios);
+document.getElementById("fecha").addEventListener("change", actualizarHorarios);
+
+// Formularios
+document.getElementById('formCita').addEventListener('submit', e => {
+    e.preventDefault();
+    alert('✅ ¡Cita registrada exitosamente! Nos pondremos en contacto contigo pronto.');
+    e.target.reset();
+});
+document.getElementById('formNewsletter').addEventListener('submit', e => {
+    e.preventDefault();
+    alert('¡Gracias por suscribirte!');
+    e.target.reset();
+});
+</script>
+</body>
+</html>
