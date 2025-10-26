@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de Pacientes</title>
+  <link rel="stylesheet" href="./css/historial.css">
+</head>
+<body>
+  <!-- CABECERA -->
+  <header class="top-header">
+    <div class="brand">
+      <h1>Cita Eficiente</h1>
+      <div class="counter">
+        <span>0</span><span>0</span><span>0</span><span>0</span><span>4</span><span>6</span>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="#">INICIO</a>
+      <a href="#">FORMULARIO</a>
+      <a href="#">ACERCA DE</a>
+      <a href="#">SERVICIOS</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo">PM</div>
+      <div class="header-info">
+        <h1>Historial de Pacientes</h1>
+        <p class="lead">Registros clínicos recientes del Policlínico</p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" class="search-input" placeholder="Buscar paciente...">
+      <button class="btn primary" id="btnNuevo">+ Nuevo registro</button>
+      <button class="btn outline" id="btnCSV">Exportar CSV</button>
+      <button class="btn outline" id="btnPDF">Exportar PDF</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="hist-table">
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>Edad</th>
+            <th>Diagnóstico</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody">
+          <tr>
+            <td><strong>Juan Pérez</strong><br><small>DNI 75234123</small></td>
+            <td>34</td>
+            <td><span class="pill">Control general</span></td>
+            <td>25/10/2025</td>
+            <td class="actions"><button class="btn view">Ver</button></td>
+          </tr>
+          <tr>
+            <td><strong>María López</strong><br><small>DNI 74892010</small></td>
+            <td>29</td>
+            <td><span class="pill">Consulta odontológica</span></td>
+            <td>22/10/2025</td>
+            <td class="actions"><button class="btn view">Ver</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL FORMULARIO -->
+  <div class="modal" id="modalRegistro">
+    <div class="modal-content">
+      <h2 class="modal-title">Nuevo Registro</h2>
+      <form class="form-registro" id="formHistorial">
+        <div class="field-group">
+          <label>Nombre del paciente</label>
+          <input type="text" id="nombre" required>
+        </div>
+        <div class="field-group">
+          <label>DNI</label>
+          <input type="text" id="dni" required>
+        </div>
+        <div class="field-group">
+          <label>Edad</label>
+          <input type="number" id="edad" required>
+        </div>
+        <div class="field-group">
+          <label>Diagnóstico</label>
+          <input type="text" id="diagnostico" required>
+        </div>
+        <div class="field-group">
+          <label>Fecha</label>
+          <input type="date" id="fecha" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-cancel" id="btnCerrar">Cancelar</button>
+          <button type="submit" class="btn primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./js/historial.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Empresa - Soluciones Digitales</title>
+    <link rel="stylesheet" href="./css/VistaEmpleados.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav>
+        <div class="logo">TuLogo</div>
+        <div class="nav-links">
+            <a href="#" class="active">Inicio</a>
+            <a href="#">Productos</a>
+            <a href="#">Servicios</a>
+            <a href="#">Blog</a>
+            <a href="#" class="contact-btn">Contacto</a>
+        </div>
+    </nav>
+
+   <!-- parte ---------------------2 -->
+
+    <header class="imagen">
+        <div class="imagen-content">
+            <h1>Medicos disponibles</h1>
+            <p>visualisa los medicos segun su especialidad y sus horarios disponibles</p>
+            <button class="cta-button">Ver más</button>
+        </div>
+    </header>
+
+    <!-- Sección de Especialidades -->
+    <section class="especialidades">
+        <div class="container">
+            <h2 class="section-title">Nuestros Especialistas</h2>
+            
+            <!-- Pestañas de especialidades -->
+            <div class="especialidades-tabs">
+                <button class="tab-btn active" data-tab="cardiologia">Cardiología</button>
+                <button class="tab-btn" data-tab="pediatria">Pediatría</button>
+                <button class="tab-btn" data-tab="dermatologia">Dermatología</button>
+                <button class="tab-btn" data-tab="ginecologia">Ginecología</button>
+                <button class="tab-btn" data-tab="oftalmologia">Oftalmología</button>
+                <button class="tab-btn" data-tab="ortopedia">Ortopedia</button>
+            </div>
+            
+            <!-- Contenido de las pestañas -->
+            <div class="tab-content">
+                <!-- Cardiología -->
+                <div class="tab-pane active" id="cardiologia">
+                    <h3 class="especialidad-titulo">Cardiólogos</h3>
+                    <div class="doctores-grid">
+                        <!-- Doctor 1 -->
+                        <div class="doctor-card">
+                            <div class="doctor-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Dr. Juan Pérez">
+                                <span class="status online"></span>
+                            </div>
+                            <h3>Dr. Juan Pérez</h3>
+                            <p class="especialidad">Cardiólogo</p>
+                            <p class="horario">Lun-Vie: 8:00 AM - 4:00 PM</p>
+                            <div class="doctor-actions">
+                                <button class="btn btn-ver">Ver Perfil</button>
+                                <button class="btn btn-agendar">Agendar Cita</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Doctor 2 - Se pueden duplicar y modificar según sea necesario -->
+                        <div class="doctor-card">
+                            <div class="doctor-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Dr. Roberto Sánchez">
+                                <span class="status online"></span>
+                            </div>
+                            <h3>Dr. Roberto Sánchez</h3>
+                            <p class="especialidad">Cardiólogo</p>
+                            <p class="horario">Lun-Vie: 9:00 AM - 5:00 PM</p>
+                            <div class="doctor-actions">
+                                <button class="btn btn-ver">Ver Perfil</button>
+                                <button class="btn btn-agendar">Agendar Cita</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Agregar más doctores según sea necesario (hasta 7) -->
+                    </div>
+                </div>
+                
+                <!-- Otras especialidades (inicialmente ocultas) -->
+                <div class="tab-pane" id="pediatria">
+                    <h3 class="especialidad-titulo">Pediatras</h3>
+                    <div class="doctores-grid">
+                        <!-- Doctores de pediatría aquí -->
+                    </div>
+                </div>
+                
+                <div class="tab-pane" id="dermatologia">
+                    <h3 class="especialidad-titulo">Dermatólogos</h3>
+                    <div class="doctores-grid">
+                        <!-- Doctores de dermatología aquí -->
+                    </div>
+                </div>
+                
+                <!-- Agregar más especialidades según sea necesario -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Contacto</h4>
+                <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+                <p><i class="fas fa-envelope"></i> info@tuempresa.com</p>
+            </div>
+            <div class="footer-section">
+                <h4>Síguenos</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../vista/js/VISTAEMPLEADOS.JS"></script>
+</body>
+</html>
