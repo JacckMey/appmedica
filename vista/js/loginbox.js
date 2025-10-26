@@ -78,7 +78,7 @@ if (formLogin) {
       });
       alert(r.msg || '✅ Login correcto');
       // Redirige a tu vista protegida:
-      window.location.href = '/agendacita.html';
+     window.location.href = '/agendarcita.html';
     } catch (err) {
       alert('❌ ' + err.message);
     }
