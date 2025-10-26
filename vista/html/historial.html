@@ -1,128 +1,92 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Historial y Registro de Pacientes</title>
-  <link rel="stylesheet" href="../css/historial.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de Pacientes</title>
+  <link rel="stylesheet" href="../css/historial.css">
 </head>
 <body>
   <div class="container">
     <header class="header">
-      <div class="logo">PC</div>
+      <div class="logo">PM</div>
       <div class="header-info">
-        <h1>Historial clínico – Policlínico San Nicolás</h1>
-        <p class="lead">Registro de consultas, diagnósticos y tratamientos del paciente</p>
+        <h1>Historial de Pacientes</h1>
+        <p class="lead">Registros clínicos recientes del Policlínico</p>
       </div>
     </header>
 
-    <section class="toolbar">
-      <input type="text" placeholder="Buscar por nombre, DNI, motivo..." class="search-input" />
-      <button class="btn primary" id="btnNuevo">+ Nuevo Registro</button>
-      <button class="btn outline" id="btnExport">Exportar CSV</button>
-    </section>
+    <div class="toolbar">
+      <input type="text" placeholder="Buscar paciente..." class="search-input" id="buscarInput">
+      <button class="btn primary" id="btnNuevo">+ Nuevo registro</button>
+      <button class="btn outline" id="btnCSV">Exportar CSV</button>
+      <button class="btn outline" id="btnPDF">Exportar PDF</button>
+    </div>
 
-    <section class="table-wrapper">
+    <div class="table-wrapper">
       <table class="hist-table">
         <thead>
           <tr>
-            <th>Fecha</th>
-            <th>Motivo</th>
-            <th>Médico</th>
+            <th>Paciente</th>
+            <th>Edad</th>
             <th>Diagnóstico</th>
-            <th>Tratamiento</th>
-            <th>Adjuntos</th>
+            <th>Fecha</th>
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="tablaBody">
           <tr>
-            <td>2025-10-25</td>
-            <td>Consulta general</td>
-            <td>Dra. Pérez</td>
-            <td><small>Revisión anual</small></td>
-            <td><small>Sin tratamiento adicional</small></td>
-            <td><span class="pill">0 archivos</span></td>
-            <td>
-              <button class="btn view">Ver</button>
-              <button class="btn outline pdf">PDF</button>
-            </td>
+            <td><strong>Juan Pérez</strong><br><small>DNI 75234123</small></td>
+            <td>34</td>
+            <td><span class="pill">Control general</span></td>
+            <td>25/10/2025</td>
+            <td class="actions"><button class="btn view">Ver</button></td>
           </tr>
-          <!-- más filas aquí -->
+          <tr>
+            <td><strong>María López</strong><br><small>DNI 74892010</small></td>
+            <td>29</td>
+            <td><span class="pill">Consulta odontológica</span></td>
+            <td>22/10/2025</td>
+            <td class="actions"><button class="btn view">Ver</button></td>
+          </tr>
         </tbody>
       </table>
-    </section>
+    </div>
   </div>
 
-  <!-- Modal para nuevo registro -->
-  <div class="modal" id="modalForm">
+  <!-- Modal del formulario -->
+  <div class="modal" id="modalRegistro">
     <div class="modal-content">
-      <h2 class="modal-title">Registrar Nuevo Paciente</h2>
-      <form id="formPaciente" class="form-registro">
+      <h2 class="modal-title">Nuevo Registro Médico</h2>
+      <form class="form-registro" id="formHistorial">
         <div class="field-group">
-          <label for="nombre">Nombre completo:</label>
-          <input type="text" id="nombre" name="nombre" required />
+          <label>Nombre del Paciente:</label>
+          <input type="text" id="nombre" required>
         </div>
         <div class="field-group">
-          <label for="dni">DNI:</label>
-          <input type="text" id="dni" name="dni" required />
+          <label>DNI:</label>
+          <input type="number" id="dni" required>
         </div>
         <div class="field-group">
-          <label for="edad">Edad:</label>
-          <input type="number" id="edad" name="edad" required />
+          <label>Edad:</label>
+          <input type="number" id="edad" required>
         </div>
         <div class="field-group">
-          <label for="sexo">Sexo:</label>
-          <select id="sexo" name="sexo" required>
-            <option value="">Seleccione...</option>
-            <option value="M">Masculino</option>
-            <option value="F">Femenino</option>
-          </select>
+          <label>Diagnóstico:</label>
+          <input type="text" id="diagnostico" required>
         </div>
         <div class="field-group">
-          <label for="telefono">Teléfono:</label>
-          <input type="tel" id="telefono" name="telefono" />
-        </div>
-        <div class="field-group">
-          <label for="correo">Correo electrónico:</label>
-          <input type="email" id="correo" name="correo" />
-        </div>
-        <div class="field-group">
-          <label for="fecha">Fecha de atención:</label>
-          <input type="date" id="fecha" name="fecha" required />
-        </div>
-        <div class="field-group">
-          <label for="diagnostico">Diagnóstico:</label>
-          <textarea id="diagnostico" name="diagnostico" rows="3" required></textarea>
-        </div>
-        <div class="field-group">
-          <label for="tratamiento">Tratamiento:</label>
-          <textarea id="tratamiento" name="tratamiento" rows="3"></textarea>
+          <label>Fecha de atención:</label>
+          <input type="date" id="fecha" required>
         </div>
         <div class="form-actions">
+          <button type="button" class="btn-cancel" id="btnCerrar">Cancelar</button>
           <button type="submit" class="btn primary">Guardar</button>
-          <button type="button" class="btn outline cancel" id="btnCerrar">Cancelar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <script>
-    const modal = document.getElementById('modalForm');
-    const btnNuevo = document.getElementById('btnNuevo');
-    const btnCerrar = document.getElementById('btnCerrar');
-
-    btnNuevo.onclick = () => {
-      modal.style.display = 'flex';
-    };
-    btnCerrar.onclick = () => {
-      modal.style.display = 'none';
-    };
-    window.onclick = (e) => {
-      if(e.target === modal) {
-        modal.style.display = 'none';
-      }
-    };
-  </script>
+  <script src="../js/historial.js"></script>
 </body>
 </html>
