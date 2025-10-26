@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historial y Registro de Pacientes</title>
+  <link rel="stylesheet" href="../css/historial.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">PC</div>
+      <div class="header-info">
+        <h1>Historial clínico – Policlínico San Nicolás</h1>
+        <p class="lead">Registro de consultas, diagnósticos y tratamientos del paciente</p>
+      </div>
+    </header>
+
+    <section class="toolbar">
+      <input type="text" placeholder="Buscar por nombre, DNI, motivo..." class="search-input" />
+      <button class="btn primary" id="btnNuevo">+ Nuevo Registro</button>
+      <button class="btn outline" id="btnExport">Exportar CSV</button>
+    </section>
+
+    <section class="table-wrapper">
+      <table class="hist-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Motivo</th>
+            <th>Médico</th>
+            <th>Diagnóstico</th>
+            <th>Tratamiento</th>
+            <th>Adjuntos</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-10-25</td>
+            <td>Consulta general</td>
+            <td>Dra. Pérez</td>
+            <td><small>Revisión anual</small></td>
+            <td><small>Sin tratamiento adicional</small></td>
+            <td><span class="pill">0 archivos</span></td>
+            <td>
+              <button class="btn view">Ver</button>
+              <button class="btn outline pdf">PDF</button>
+            </td>
+          </tr>
+          <!-- más filas aquí -->
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- Modal para nuevo registro -->
+  <div class="modal" id="modalForm">
+    <div class="modal-content">
+      <h2 class="modal-title">Registrar Nuevo Paciente</h2>
+      <form id="formPaciente" class="form-registro">
+        <div class="field-group">
+          <label for="nombre">Nombre completo:</label>
+          <input type="text" id="nombre" name="nombre" required />
+        </div>
+        <div class="field-group">
+          <label for="dni">DNI:</label>
+          <input type="text" id="dni" name="dni" required />
+        </div>
+        <div class="field-group">
+          <label for="edad">Edad:</label>
+          <input type="number" id="edad" name="edad" required />
+        </div>
+        <div class="field-group">
+          <label for="sexo">Sexo:</label>
+          <select id="sexo" name="sexo" required>
+            <option value="">Seleccione...</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="telefono">Teléfono:</label>
+          <input type="tel" id="telefono" name="telefono" />
+        </div>
+        <div class="field-group">
+          <label for="correo">Correo electrónico:</label>
+          <input type="email" id="correo" name="correo" />
+        </div>
+        <div class="field-group">
+          <label for="fecha">Fecha de atención:</label>
+          <input type="date" id="fecha" name="fecha" required />
+        </div>
+        <div class="field-group">
+          <label for="diagnostico">Diagnóstico:</label>
+          <textarea id="diagnostico" name="diagnostico" rows="3" required></textarea>
+        </div>
+        <div class="field-group">
+          <label for="tratamiento">Tratamiento:</label>
+          <textarea id="tratamiento" name="tratamiento" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn primary">Guardar</button>
+          <button type="button" class="btn outline cancel" id="btnCerrar">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('modalForm');
+    const btnNuevo = document.getElementById('btnNuevo');
+    const btnCerrar = document.getElementById('btnCerrar');
+
+    btnNuevo.onclick = () => {
+      modal.style.display = 'flex';
+    };
+    btnCerrar.onclick = () => {
+      modal.style.display = 'none';
+    };
+    window.onclick = (e) => {
+      if(e.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+  </script>
+</body>
+</html>
