@@ -7,17 +7,33 @@
   <link rel="stylesheet" href="../css/historial.css">
 </head>
 <body>
+  <!-- CABECERA -->
+  <header class="top-header">
+    <div class="brand">
+      <h1>Cita Eficiente</h1>
+      <div class="counter">
+        <span>0</span><span>0</span><span>0</span><span>0</span><span>4</span><span>6</span>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="#">INICIO</a>
+      <a href="#">FORMULARIO</a>
+      <a href="#">ACERCA DE</a>
+      <a href="#">SERVICIOS</a>
+    </nav>
+  </header>
+
   <div class="container">
-    <header class="header">
+    <div class="header">
       <div class="logo">PM</div>
       <div class="header-info">
         <h1>Historial de Pacientes</h1>
         <p class="lead">Registros clínicos recientes del Policlínico</p>
       </div>
-    </header>
+    </div>
 
     <div class="toolbar">
-      <input type="text" placeholder="Buscar paciente..." class="search-input" id="buscarInput">
+      <input type="text" class="search-input" placeholder="Buscar paciente...">
       <button class="btn primary" id="btnNuevo">+ Nuevo registro</button>
       <button class="btn outline" id="btnCSV">Exportar CSV</button>
       <button class="btn outline" id="btnPDF">Exportar PDF</button>
@@ -54,33 +70,33 @@
     </div>
   </div>
 
-  <!-- Modal del formulario -->
+  <!-- MODAL FORMULARIO -->
   <div class="modal" id="modalRegistro">
     <div class="modal-content">
-      <h2 class="modal-title">Nuevo Registro Médico</h2>
+      <h2 class="modal-title">Nuevo Registro</h2>
       <form class="form-registro" id="formHistorial">
         <div class="field-group">
-          <label>Nombre del Paciente:</label>
+          <label>Nombre del paciente</label>
           <input type="text" id="nombre" required>
         </div>
         <div class="field-group">
-          <label>DNI:</label>
-          <input type="number" id="dni" required>
+          <label>DNI</label>
+          <input type="text" id="dni" required>
         </div>
         <div class="field-group">
-          <label>Edad:</label>
+          <label>Edad</label>
           <input type="number" id="edad" required>
         </div>
         <div class="field-group">
-          <label>Diagnóstico:</label>
+          <label>Diagnóstico</label>
           <input type="text" id="diagnostico" required>
         </div>
         <div class="field-group">
-          <label>Fecha de atención:</label>
+          <label>Fecha</label>
           <input type="date" id="fecha" required>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn-cancel" id="btnCerrar">Cancelar</button>
+          <button type="button" class="btn btn-cancel" id="btnCerrar">Cancelar</button>
           <button type="submit" class="btn primary">Guardar</button>
         </div>
       </form>
