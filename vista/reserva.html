@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservar Cita Médica - MediCitas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        .step-active {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+        .time-slot {
+            transition: all 0.2s ease;
+        }
+        .time-slot:hover:not(.occupied):not(.selected) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .time-slot.occupied {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .time-slot.selected {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+        .chatbot {
+            transition: all 0.3s ease;
+        }
+        .chatbot.open {
+            transform: translateY(0);
+        }
+        .chatbot.closed {
+            transform: translateY(calc(100% - 70px));
+        }
+        .message {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .specialty-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .specialty-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .specialty-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        .specialty-card:hover::before {
+            opacity: 1;
+        }
+        .specialty-card.selected {
+            border: 3px solid #3b82f6;
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            transform: scale(1.03);
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+        }
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .mobile-menu.active {
+            max-height: 400px;
+        }
+        
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .animate-scaleIn {
+            animation: scaleIn 0.4s ease;
+        }
+        
+        .animate-bounceIn {
+            animation: bounceIn 0.6s ease;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
+    
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-40">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-blue-600">Cita Eficiente</h1>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">INICIO</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">RESERVA</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">HISTORIAL</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">SERVICIOS</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">DASHBOARD</a>
+                    <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-sm">
+                        LOGIN
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="mobile-menu md:hidden bg-white border-t border-gray-200">
+            <div class="px-4 py-4 space-y-3">
+                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium py-2 transition-colors">INICIO</a>
+                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium py-2 transition-colors">RESERVA</a>
+                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium py-2 transition-colors">HISTORIAL</a>
+                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium py-2 transition-colors">SERVICIOS</a>
+                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium py-2 transition-colors">DASHBOARD</a>
+                <a href="index.html" class="block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all text-center">
+                    LOGIN
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="w-full px-3 md:px-4 lg:px-6 py-4 md:py-6">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-4 md:p-8 text-white shadow-2xl mb-6 mt-4">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">🏥 Reservar Cita Médica</h1>
+                    <p class="text-blue-100">Sistema fácil y rápido para agendar tu consulta</p>
+                </div>
+                <div class="bg-white/20 backdrop-blur px-6 py-3 rounded-2xl">
+                    <p class="text-sm text-blue-100">Paso</p>
+                    <p class="text-3xl font-bold" id="currentStep">1</p>
+                    <p class="text-sm text-blue-100">de 4</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="bg-white rounded-2xl p-2 shadow-lg mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex-1 text-center">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mb-2" id="step1Indicator">1</div>
+                    <p class="text-xs font-semibold text-gray-700">Especialidad</p>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200" id="progress1"></div>
+                <div class="flex-1 text-center">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-gray-300 text-white flex items-center justify-center font-bold mb-2" id="step2Indicator">2</div>
+                    <p class="text-xs font-semibold text-gray-500">Fecha</p>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200" id="progress2"></div>
+                <div class="flex-1 text-center">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-gray-300 text-white flex items-center justify-center font-bold mb-2" id="step3Indicator">3</div>
+                    <p class="text-xs font-semibold text-gray-500">Horario</p>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200" id="progress3"></div>
+                <div class="flex-1 text-center">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-gray-300 text-white flex items-center justify-center font-bold mb-2" id="step4Indicator">4</div>
+                    <p class="text-xs font-semibold text-gray-500">Confirmar</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Selección de Especialidad -->
+        <div id="step1" class="step-card bg-white rounded-3xl shadow-2xl p-6 md:p-8 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">¿Qué especialidad necesitas?</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-6">
+                <div class="specialty-card bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-blue-200" data-specialty="Medicina General" onclick="selectSpecialty('Medicina General', this)">
+                <img src="https://i.pinimg.com/1200x/55/42/bf/5542bf48605b29b7484143beacdacbac.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Medicina General</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Consulta general y chequeos</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-indigo-200" data-specialty="Medicina Interna" onclick="selectSpecialty('Medicina Interna', this)">
+                <img src="https://clinicamadrezoraida.com.pe/wp-content/uploads/2025/03/medicina-interna1-1.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Medicina Interna</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Diagnóstico de adultos</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-pink-50 to-pink-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-pink-200" data-specialty="Pediatría" onclick="selectSpecialty('Pediatría', this)">
+                <img src="https://i.pinimg.com/1200x/60/b9/e9/60b9e9c6fd8fbeeebab9eee2973507bd.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Pediatría</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Atención para niños</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-rose-50 to-rose-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-rose-200" data-specialty="Ginecología y Obstetricia" onclick="selectSpecialty('Ginecología y Obstetricia', this)">
+                <img src="https://i.pinimg.com/736x/c8/2a/56/c82a56695c6ca4e3d8056e462ec6b790.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Ginecología y Obstetricia</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Salud reproductiva</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-gray-200" data-specialty="Cirugía General" onclick="selectSpecialty('Cirugía General', this)">
+                <img src="https://i.pinimg.com/736x/f9/73/ab/f973abf55ce0ef20764bb5d3f7e6fb39.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Cirugía General</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Procedimientos quirúrgicos</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-orange-50 to-orange-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-orange-200" data-specialty="Traumatología y Ortopedia" onclick="selectSpecialty('Traumatología y Ortopedia', this)">
+                <img src="https://i.pinimg.com/1200x/59/84/0b/59840b14722c277e24dc098108504ddc.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Traumatología y Ortopedia</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Huesos y articulaciones</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-red-50 to-red-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-red-200" data-specialty="Cardiología" onclick="selectSpecialty('Cardiología', this)">
+                <img src="https://i.pinimg.com/1200x/a0/fc/3c/a0fc3c60d00cb6db135b8d6b8d71277a.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Cardiología</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Corazón y cardiovascular</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-cyan-200" data-specialty="Neumología" onclick="selectSpecialty('Neumología', this)">
+                <img src="https://i.pinimg.com/1200x/7a/d1/11/7ad11166b270cf6df8829ff4d7b0dbd4.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Neumología</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Sistema respiratorio</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-teal-50 to-teal-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-teal-200" data-specialty="Dermatología" onclick="selectSpecialty('Dermatología', this)">
+                <img src="https://i.pinimg.com/736x/fb/4f/ee/fb4feeba6b1bb4f4e8eeed3bc37816db.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Dermatología</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Piel, cabello y uñas</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-violet-50 to-violet-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-violet-200" data-specialty="Oftalmología" onclick="selectSpecialty('Oftalmología', this)">
+                <img src="https://i.pinimg.com/736x/87/54/64/8754648958d2dee084c5a366e23b88ce.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Oftalmología</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Ojos y visión</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-amber-50 to-amber-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-amber-200" data-specialty="Otorrinolaringología" onclick="selectSpecialty('Otorrinolaringología', this)">
+                <img src="https://i.pinimg.com/1200x/bd/85/78/bd8578ae4d63dd5db5e051c3b2422df9.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Otorrinolaringología</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Oído, nariz y garganta</p>
+                </div>
+            </div>
+
+                <div class="specialty-card bg-gradient-to-br from-purple-50 to-purple-100 rounded-3xl p-0 border-2 group shadow-lg overflow-hidden border-purple-200" data-specialty="Psicología" onclick="selectSpecialty('Psicología', this)">
+                <img src="https://i.pinimg.com/1200x/6a/de/a9/6adea9b233d8b6757a70b8f05d88d230.jpg" alt="Especialidad" class="w-full h-48 object-cover mb-0 transition-transform duration-300 group-hover:scale-105">
+                <div class="p-6">
+                <h3 class="font-bold text-gray-800 text-xl font-extrabold mb-2">Psicología</h3>
+                <p class="text-base text-gray-600 leading-relaxed">Salud mental</p>
+                </div>
+            </div>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mb-6">
+                <div class="flex items-start gap-3">
+                    <svg class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <p class="font-bold text-yellow-800 mb-1">¿No sabes qué especialidad elegir?</p>
+                        <p class="text-sm text-yellow-700">Usa nuestro asistente virtual haciendo clic en el botón de ayuda en la esquina inferior derecha. Te ayudaremos a encontrar la especialidad correcta según tus síntomas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="goToStep(2)" id="btnStep1" disabled class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg">
+                Continuar a Selección de Fecha →
+            </button>
+        </div>
+
+        <!-- Step 2: Selección de Fecha -->
+        <div id="step2" class="step-card bg-white rounded-3xl shadow-2xl p-6 md:p-8 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">¿Qué día prefieres?</h2>
+            
+            <div class="bg-blue-50 rounded-2xl p-6 mb-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <button onclick="previousWeek()" class="w-10 h-10 bg-white rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors shadow">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="flex-1 text-center">
+                        <p class="text-base text-gray-600 leading-relaxed">Semana seleccionada</p>
+                        <p class="font-bold text-lg text-gray-800" id="weekRange"></p>
+                    </div>
+                    <button onclick="nextWeek()" class="w-10 h-10 bg-white rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors shadow">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-7 gap-2" id="daysGrid">
+                    <!-- Días generados dinámicamente -->
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="goToStep(1)" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-4 rounded-xl transition-all text-lg">
+                    ← Volver
+                </button>
+                <button onclick="goToStep(3)" id="btnStep2" disabled class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg">
+                    Continuar a Horarios →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Selección de Horario -->
+        <div id="step3" class="step-card bg-white rounded-3xl shadow-2xl p-6 md:p-8 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Elige tu horario</h2>
+            <p class="text-gray-600 mb-6" id="selectedDateInfo">Para el día seleccionado</p>
+
+            <div class="mb-6">
+                <div class="flex gap-4 mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-green-500 rounded"></div>
+                        <span class="text-sm text-gray-600">Disponible</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-red-300 rounded"></div>
+                        <span class="text-sm text-gray-600">Ocupado</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded"></div>
+                        <span class="text-sm text-gray-600">Seleccionado</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="timeSlotsGrid">
+                    <!-- Horarios generados dinámicamente -->
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="goToStep(2)" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-4 rounded-xl transition-all text-lg">
+                    ← Volver
+                </button>
+                <button onclick="goToStep(4)" id="btnStep3" disabled class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg">
+                    Continuar a Confirmación →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: Confirmación -->
+        <div id="step4" class="step-card bg-white rounded-3xl shadow-2xl p-6 md:p-8 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Confirma tu cita</h2>
+
+            <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 mb-6">
+                <h3 class="font-bold text-gray-800 mb-4 text-lg">📋 Resumen de tu cita</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Especialidad:</span>
+                        <span class="font-bold text-gray-800" id="summarySpecialty">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Fecha:</span>
+                        <span class="font-bold text-gray-800" id="summaryDate">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Horario:</span>
+                        <span class="font-bold text-gray-800" id="summaryTime">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Doctor Asignado:</span>
+                        <span class="font-bold text-gray-800" id="summaryDoctor">Dr. Asignado Automáticamente</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6">
+                <h3 class="font-bold text-gray-800 mb-4 text-lg">👤 Tus datos</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre completo *</label>
+                        <input type="text" id="patientName" required placeholder="Ingresa tu nombre" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono *</label>
+                        <input type="tel" id="patientPhone" required placeholder="+51 999 999 999" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
+                        <input type="email" id="patientEmail" required placeholder="correo@ejemplo.com" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">DNI *</label>
+                        <input type="text" id="patientDNI" required placeholder="12345678" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Motivo de consulta (opcional)</label>
+                        <textarea id="patientReason" rows="3" placeholder="Describe brevemente el motivo de tu consulta..." class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"></textarea>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">📎 Documentos/Imágenes (opcional)</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 transition-colors">
+                            <input type="file" id="patientFiles" multiple accept="image/*,.pdf,.doc,.docx" class="hidden" onchange="handleFileSelect(event)">
+                            <label for="patientFiles" class="cursor-pointer">
+                                <div class="mb-2">
+                                    <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-1">
+                                    <span class="text-blue-600 font-semibold">Haz clic para subir</span> o arrastra archivos aquí
+                                </p>
+                                <p class="text-xs text-gray-500">PNG, JPG, PDF, DOC (máx. 5MB c/u)</p>
+                            </label>
+                        </div>
+                        <div id="fileList" class="mt-3 space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="goToStep(3)" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-4 rounded-xl transition-all text-lg">
+                    ← Volver
+                </button>
+                <button onclick="confirmAppointment()" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg text-lg">
+                    ✅ Confirmar Cita
+                </button>
+            </div>
+        </div>
+
+        <!-- Mensaje de Éxito -->
+        <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center relative animate-scaleIn">
+                <!-- Botón de cerrar -->
+                <button onclick="closeSuccessModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounceIn">
+                    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">¡Cita Confirmada!</h3>
+                <p class="text-gray-600 mb-6">Tu cita ha sido registrada exitosamente. Recibirás un correo de confirmación con todos los detalles.</p>
+                
+                <div class="flex gap-3">
+                    <button onclick="closeSuccessModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-xl transition-all">
+                        Cerrar
+                    </button>
+                    <button onclick="location.reload()" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all">
+                        Nueva Cita
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Chatbot AI Assistant -->
+    <div class="chatbot closed fixed bottom-0 right-4 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-t-3xl shadow-2xl z-50" id="chatbot">
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-3xl cursor-pointer" onclick="toggleChatbot()">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden">
+    <img 
+        src="https://i.pinimg.com/736x/a1/4d/90/a14d900e6c3f4bf956377221122cb479.jpg" 
+        alt="Asistente"
+        class="w-8 h-8 object-contain">
+    </div>
+
+                    <div>
+                        <p class="font-bold">Asistente de Orientación Médica</p>
+                        <p class="text-xs text-blue-100" id="chatbotStatus">Te ayudo a encontrar la especialidad adecuada</p>
+                    </div>
+                </div>
+                <svg class="w-6 h-6" id="chatbotIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+            </div>
+        </div>
+        
+        <div class="h-96 overflow-y-auto p-4 space-y-3" id="chatMessages">
+            <div class="message flex gap-3">
+        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
+    <img 
+        src="https://i.pinimg.com/originals/80/7b/5c/807b5c4b02e765bb4930b7c66662ef4b.gif"
+        alt="Asistente"
+        class="w-6 h-6 object-contain">
+    </div>
+
+                <div class="bg-blue-50 rounded-2xl rounded-tl-none p-3 max-w-[80%]">
+                    <p class="text-sm text-gray-800">    ¡Hola! 👋 Soy tu asistente virtual de orientación médica.
+    Estoy aquí para ayudarte a identificar la especialidad más adecuada
+    según los síntomas que nos comentes.
+    <br><br>
+    Cuéntame, ¿qué molestias presentas hoy?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-gray-200">
+            <div class="flex gap-2">
+                <input 
+                    type="text" 
+                    id="chatInput" 
+                    placeholder="Describe tus síntomas..." 
+                    class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    onkeypress="if(event.key === 'Enter') sendMessage()"
+                >
+                <button onclick="sendMessage()" id="sendBtn" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all font-semibold">
+                    Enviar
+                </button>
+            </div>
+<p class="text-xs text-gray-500 mt-2 text-center flex items-center justify-center gap-1">
+    <img src="https://i.pinimg.com/originals/80/7b/5c/807b5c4b02e765bb4930b7c66662ef4b.gif" alt="IA" class="w-4 h-4 object-contain">
+    Orientación médica · No reemplaza al médico
+</p>
+        </div>
+    </div>
+
+    <script>
+        // NAVBAR MOBILE MENU
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+
+        // DATOS GLOBALES
+        let bookingData = {
+            specialty: null,
+            date: null,
+            time: null,
+            dayOfWeek: null
+        };
+
+        // Obtener la fecha actual y calcular el inicio de la semana
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Calcular el domingo de la semana actual
+        let currentWeekStart = new Date(today);
+        currentWeekStart.setDate(today.getDate() - today.getDay());
+        
+        let chatbotOpen = false;
+        let conversationHistory = [];
+        let isProcessing = false;
+
+        // MAPEO DE ESPECIALIDADES A IDs (coincide con la BD)
+        const especialidadesMap = {
+            'Medicina General': 1,
+            'Medicina Interna': 2,
+            'Pediatría': 3,
+            'Ginecología y Obstetricia': 4,
+            'Cirugía General': 5,
+            'Traumatología y Ortopedia': 6,
+            'Cardiología': 7,
+            'Neumología': 8,
+            'Dermatología': 9,
+            'Oftalmología': 10,
+            'Otorrinolaringología': 11,
+            'Psicología': 12
+        };
+
+        // Función para generar horarios ocupados de ejemplo
+        function getOccupiedSlotsForDate(dateString) {
+            // Simulación de horarios ocupados - en producción vendría de tu base de datos
+            const dayOfWeek = new Date(dateString).getDay();
+            
+            // Diferentes horarios ocupados según el día de la semana
+            const occupiedByDay = {
+                0: ['10:00', '14:00'], // Domingo
+                1: ['09:00', '11:00', '15:00'], // Lunes
+                2: ['10:00', '13:00', '16:00'], // Martes
+                3: ['09:00', '12:00', '17:00'], // Miércoles
+                4: ['11:00', '14:00', '18:00'], // Jueves
+                5: ['09:00', '13:00', '15:00'], // Viernes
+                6: ['10:00', '12:00', '16:00']  // Sábado
+            };
+            
+            return occupiedByDay[dayOfWeek] || [];
+        }
+
+        const timeSlots = [
+            '09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
+            '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'
+        ];
+
+        const SPECIALTIES = {
+            'Medicina General': {
+                emoji: '🩺',
+                keywords: ['fiebre', 'gripe', 'tos', 'malestar', 'chequeo', 'general', 'resfriado', 'dolor general']
+            },
+            'Medicina Interna': {
+                emoji: '⚕️',
+                keywords: ['diabetes', 'hipertensión', 'colesterol', 'tiroides', 'adulto mayor']
+            },
+            'Pediatría': {
+                emoji: '👶',
+                keywords: ['niño', 'bebé', 'fiebre infantil', 'vacuna', 'desarrollo', 'hijo', 'menor']
+            },
+            'Ginecología y Obstetricia': {
+                emoji: '🤰',
+                keywords: ['embarazo', 'menstruación', 'parto', 'ginecológico', 'mujer', 'prenatal', 'gestación']
+            },
+            'Cirugía General': {
+                emoji: '🔪',
+                keywords: ['operación', 'cirugía', 'quirófano', 'intervención', 'post operatorio']
+            },
+            'Traumatología y Ortopedia': {
+                emoji: '🦴',
+                keywords: ['hueso', 'fractura', 'articulación', 'esguince', 'rodilla', 'tobillo', 'músculo', 'lesión']
+            },
+            'Cardiología': {
+                emoji: '❤️',
+                keywords: ['corazón', 'pecho', 'presión', 'taquicardia', 'palpitaciones', 'infarto', 'cardiovascular']
+            },
+            'Neumología': {
+                emoji: '🫁',
+                keywords: ['pulmón', 'respiración', 'asma', 'bronquitis', 'neumonía', 'oxígeno', 'respiratorio']
+            },
+            'Dermatología': {
+                emoji: '✨',
+                keywords: ['piel', 'acné', 'mancha', 'picazón', 'sarpullido', 'lunar', 'erupción', 'dermatitis']
+            },
+            'Oftalmología': {
+                emoji: '👁️',
+                keywords: ['ojo', 'vista', 'visión', 'lentes', 'ceguera', 'conjuntivitis', 'miopía']
+            },
+            'Otorrinolaringología': {
+                emoji: '👂',
+                keywords: ['oído', 'nariz', 'garganta', 'amigdalas', 'sinusitis', 'otitis', 'ronquera']
+            },
+            'Psicología': {
+                emoji: '🧠',
+                keywords: ['ansiedad', 'depresión', 'estrés', 'mental', 'emocional', 'terapia', 'psicológico']
+            }
+        };
+
+        // FUNCIONES DE ESPECIALIDAD
+        function selectSpecialty(specialty, element) {
+            document.querySelectorAll('.specialty-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            bookingData.specialty = specialty;
+            document.getElementById('btnStep1').disabled = false;
+        }
+
+        // FUNCIÓN PARA SELECCIONAR DESDE EL CHATBOT
+        function selectSpecialtyFromBot(specialty) {
+            const specialtyCard = document.querySelector(`[data-specialty="${specialty}"]`);
+            if (specialtyCard) {
+                selectSpecialty(specialty, specialtyCard);
+                
+                // Agregar mensaje de confirmación en el chat
+                addMessageToChat('assistant', `¡Perfecto! ✅ He seleccionado **${specialty}** para ti. Ahora puedes continuar con la selección de fecha y horario en el formulario principal. ¡Cierra este chat y sigue con tu reserva!`);
+                
+                // Scroll a la sección de especialidades
+                document.getElementById('step1').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // PASO 2: GENERAR DÍAS DE LA SEMANA
+        function generateWeekDays() {
+            const daysGrid = document.getElementById('daysGrid');
+            const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            
+            daysGrid.innerHTML = '';
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Mañana es el primer día disponible para reservar
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(currentWeekStart);
+                date.setDate(date.getDate() + i);
+                
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'text-center p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-lg';
+                dayDiv.onclick = () => selectDate(date, dayDiv);
+                
+                // Deshabilitar si es hoy o una fecha pasada
+                const isBeforeTomorrow = date < tomorrow;
+                
+                if (isBeforeTomorrow) {
+                    dayDiv.className += ' bg-gray-100 border-gray-200 opacity-50 cursor-not-allowed';
+                    dayDiv.onclick = null;
+                    dayDiv.title = date.getTime() === today.getTime() ? 'No se pueden hacer reservas para hoy' : 'Fecha no disponible';
+                } else {
+                    dayDiv.className += ' bg-white border-gray-300 hover:border-blue-500 hover:bg-blue-50';
+                }
+                
+                dayDiv.innerHTML = `
+                    <p class="text-base text-gray-600 leading-relaxed font-semibold mb-1">${days[i]}</p>
+                    <p class="text-2xl font-bold text-gray-800">${date.getDate()}</p>
+                    ${isBeforeTomorrow && date.getTime() === today.getTime() ? '<p class="text-[10px] text-red-500 mt-1">Hoy</p>' : ''}
+                `;
+                
+                daysGrid.appendChild(dayDiv);
+            }
+            
+            updateWeekRange();
+        }
+
+        function updateWeekRange() {
+            const endDate = new Date(currentWeekStart);
+            endDate.setDate(endDate.getDate() + 6);
+            
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            
+            document.getElementById('weekRange').textContent = 
+                `${currentWeekStart.getDate()} - ${endDate.getDate()} ${months[currentWeekStart.getMonth()]} ${currentWeekStart.getFullYear()}`;
+        }
+
+        function previousWeek() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const newWeekStart = new Date(currentWeekStart);
+            newWeekStart.setDate(currentWeekStart.getDate() - 7);
+            
+            // No permitir navegar a semanas anteriores a la actual
+            const currentWeekSunday = new Date(today);
+            currentWeekSunday.setDate(today.getDate() - today.getDay());
+            
+            if (newWeekStart < currentWeekSunday) {
+                return; // No permitir ir atrás
+            }
+            
+            currentWeekStart = newWeekStart;
+            generateWeekDays();
+        }
+
+        function nextWeek() {
+            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+            generateWeekDays();
+        }
+
+        function selectDate(date, element) {
+            // Verificar que la fecha sea mañana o posterior
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            
+            if (date < tomorrow) {
+                return; // No permitir seleccionar hoy o fechas pasadas
+            }
+            
+            document.querySelectorAll('#daysGrid > div').forEach(div => {
+                div.classList.remove('border-blue-500', 'bg-blue-100');
+                div.classList.add('border-gray-300', 'bg-white');
+            });
+            
+            element.classList.remove('border-gray-300', 'bg-white');
+            element.classList.add('border-blue-500', 'bg-blue-100');
+            
+            bookingData.date = date;
+            bookingData.dayOfWeek = date.getDay();
+            
+            document.getElementById('btnStep2').disabled = false;
+        }
+
+        // PASO 3: GENERAR HORARIOS
+        function generateTimeSlots() {
+            const grid = document.getElementById('timeSlotsGrid');
+            const dateKey = bookingData.date.toISOString().split('T')[0];
+            const occupied = getOccupiedSlotsForDate(dateKey);
+            
+            const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            
+            document.getElementById('selectedDateInfo').textContent = 
+                `${days[bookingData.dayOfWeek]}, ${bookingData.date.getDate()} de ${months[bookingData.date.getMonth()]} ${bookingData.date.getFullYear()}`;
+            
+            grid.innerHTML = '';
+            
+            timeSlots.forEach(time => {
+                const isOccupied = occupied.includes(time);
+                
+                const slot = document.createElement('div');
+                slot.className = 'time-slot text-center p-4 rounded-xl border-2 font-semibold transition-all';
+                
+                if (isOccupied) {
+                    slot.className += ' occupied bg-red-100 border-red-300 text-red-400 cursor-not-allowed';
+                } else {
+                    slot.className += ' bg-green-50 border-green-300 text-green-700 cursor-pointer hover:bg-green-100';
+                    slot.onclick = () => selectTime(time, slot);
+                }
+                
+                const [hour, minute] = time.split(':');
+                const displayHour = parseInt(hour) > 12 ? parseInt(hour) - 12 : parseInt(hour);
+                const period = parseInt(hour) >= 12 ? 'PM' : 'AM';
+                
+                slot.innerHTML = `
+                    <p class="text-xl font-bold">${displayHour}:${minute}</p>
+                    <p class="text-xs mt-1">${period}</p>
+                `;
+                
+                grid.appendChild(slot);
+            });
+        }
+
+        function selectTime(time, element) {
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            bookingData.time = time;
+            
+            document.getElementById('btnStep3').disabled = false;
+        }
+
+        // NAVEGACIÓN ENTRE PASOS
+        function goToStep(step) {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step${i}`).classList.add('hidden');
+            }
+            
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            document.getElementById('currentStep').textContent = step;
+            
+            for (let i = 1; i <= 4; i++) {
+                const indicator = document.getElementById(`step${i}Indicator`);
+                const progress = document.getElementById(`progress${i}`);
+                
+                if (i < step) {
+                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-green-500 text-white flex items-center justify-center font-bold mb-2';
+                    indicator.innerHTML = '✓';
+                    if (progress) progress.className = 'flex-1 h-1 bg-green-500';
+                } else if (i === step) {
+                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mb-2';
+                    indicator.textContent = i;
+                    if (progress) progress.className = 'flex-1 h-1 bg-gray-200';
+                } else {
+                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-gray-300 text-white flex items-center justify-center font-bold mb-2';
+                    indicator.textContent = i;
+                    if (progress) progress.className = 'flex-1 h-1 bg-gray-200';
+                }
+            }
+            
+            if (step === 2) {
+                generateWeekDays();
+            } else if (step === 3) {
+                generateTimeSlots();
+            } else if (step === 4) {
+                updateSummary();
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ACTUALIZAR RESUMEN
+        function updateSummary() {
+            const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            
+            document.getElementById('summarySpecialty').textContent = bookingData.specialty;
+            document.getElementById('summaryDate').textContent = 
+                `${days[bookingData.dayOfWeek]}, ${bookingData.date.getDate()} de ${months[bookingData.date.getMonth()]} ${bookingData.date.getFullYear()}`;
+            
+            const [hour, minute] = bookingData.time.split(':');
+            const displayHour = parseInt(hour) > 12 ? parseInt(hour) - 12 : parseInt(hour);
+            const period = parseInt(hour) >= 12 ? 'PM' : 'AM';
+            document.getElementById('summaryTime').textContent = `${displayHour}:${minute} ${period}`;
+        }
+
+        // CONFIRMAR CITA (MEJORADO CON DEBUG)
+        async function confirmAppointment() {
+            const name = document.getElementById('patientName').value.trim();
+            const phone = document.getElementById('patientPhone').value.trim();
+            const email = document.getElementById('patientEmail').value.trim();
+            const dni = document.getElementById('patientDNI').value.trim();
+            
+            if (!name || !phone || !email || !dni) {
+                alert('Por favor completa todos los campos obligatorios (*)');
+                return;
+            }
+            
+            // Obtener el ID de la especialidad desde el nombre
+            const especialidad_id = especialidadesMap[bookingData.specialty];
+            
+            if (!especialidad_id) {
+                alert('Error: Especialidad no válida');
+                return;
+            }
+            
+            // Formatear la hora correctamente (agregar :00 segundos)
+            const horaFormateada = bookingData.time + ':00';
+            
+            const appointmentData = {
+                especialidad_id: especialidad_id,
+                fecha: bookingData.date.toISOString().split('T')[0],
+                hora: horaFormateada,
+                paciente: {
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    dni: dni,
+                    reason: document.getElementById('patientReason').value || 'Consulta general'
+                }
+            };
+            
+            console.log('📤 Enviando cita:', appointmentData);
+            console.log('📍 URL completa:', window.location.origin + '/api/citas/crear');
+            
+            try {
+                const response = await fetch('/api/citas/crear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(appointmentData)
+                });
+                
+                console.log('📊 Status de respuesta:', response.status);
+                console.log('📊 Status text:', response.statusText);
+                
+                // Verificar si la respuesta es JSON
+                const contentType = response.headers.get('content-type');
+                console.log('📊 Content-Type:', contentType);
+                
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('❌ La respuesta no es JSON:', textResponse);
+                    alert('Error: El servidor no respondió correctamente. Revisa la consola.');
+                    return;
+                }
+                
+                const result = await response.json();
+                console.log('📥 Respuesta del servidor:', result);
+                
+                if (result.success) {
+                    console.log('✅ Cita creada:', result.data);
+                    document.getElementById('successModal').classList.remove('hidden');
+                } else {
+                    alert('❌ Error: ' + (result.message || result.error || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('❌ Error completo:', error);
+                console.error('❌ Error name:', error.name);
+                console.error('❌ Error message:', error.message);
+                console.error('❌ Error stack:', error.stack);
+                
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    alert('❌ No se puede conectar al servidor.\n\n' +
+                          '¿El servidor está corriendo en http://localhost:3000?\n' +
+                          'Verifica tu terminal donde ejecutaste "npm start"');
+                } else if (error.name === 'SyntaxError') {
+                    alert('❌ Error de formato en la respuesta del servidor.\n\n' +
+                          'El servidor devolvió HTML en vez de JSON.\n' +
+                          'Revisa la consola para más detalles.');
+                } else {
+                    alert('❌ Error inesperado: ' + error.message);
+                }
+            }
+        }
+
+        // ========== CHATBOT CON IA ==========
+        
+        function toggleChatbot() {
+            const chatbot = document.getElementById('chatbot');
+            const icon = document.getElementById('chatbotIcon');
+            chatbotOpen = !chatbotOpen;
+            
+            if (chatbotOpen) {
+                chatbot.classList.remove('closed');
+                chatbot.classList.add('open');
+                icon.innerHTML = '<polyline points="6 9 12 15 18 9"></polyline>';
+                document.getElementById('chatbotStatus').textContent = 'Conectado con IA';
+            } else {
+                chatbot.classList.remove('open');
+                chatbot.classList.add('closed');
+                icon.innerHTML = '<polyline points="18 15 12 9 6 15"></polyline>';
+                document.getElementById('chatbotStatus').textContent = '¿No sabes qué especialidad elegir?';
+            }
+        }
+
+        function addMessageToChat(role, content, isAction = false, specialty = null) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            if (isAction) {
+                messageDiv.innerHTML = `
+                    <div class="flex justify-center my-2">
+                        <button 
+                            onclick="selectSpecialtyFromBot('${specialty}')" 
+                            class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center gap-2"
+                        >
+                            ${SPECIALTIES[specialty].emoji}
+                            <span>Seleccionar ${specialty}</span>
+                        </button>
+                    </div>
+                `;
+            } else if (role === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex gap-3 justify-end">
+                        <div class="bg-blue-500 text-white rounded-2xl rounded-tr-none p-3 max-w-[80%]">
+                            <p class="text-sm">${content}</p>
+                        </div>
+                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-lg">👤</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <img 
+                    src="https://i.pinimg.com/originals/80/7b/5c/807b5c4b02e765bb4930b7c66662ef4b.gif"
+                    alt="Asistente"
+                    class="w-6 h-6 object-contain"
+                >
+            </div>
+                        <div class="bg-blue-50 rounded-2xl rounded-tl-none p-3 max-w-[80%]">
+                            <p class="text-sm text-gray-800">${content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const chatMessages = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'message flex gap-3';
+            typingDiv.innerHTML = `
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-lg">🤖</span>
+                </div>
+                <div class="bg-blue-50 rounded-2xl rounded-tl-none p-3">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function analyzeLocalSymptoms(text) {
+            const lowerText = text.toLowerCase();
+            const matches = {};
+
+            Object.entries(SPECIALTIES).forEach(([specialty, data]) => {
+                const matchCount = data.keywords.filter(keyword => 
+                    lowerText.includes(keyword)
+                ).length;
+                if (matchCount > 0) {
+                    matches[specialty] = matchCount;
+                }
+            });
+
+            if (Object.keys(matches).length === 0) return null;
+            return Object.entries(matches).sort((a, b) => b[1] - a[1])[0][0];
+        }
+
+        async function sendToAI(userMessage) {
+            try {
+                // Llamar a tu API de FastAPI con Gemini
+                const response = await fetch('http://localhost:8000/api/analizar-sintomas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        symptoms: userMessage
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.respuesta;
+                } else {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+            } catch (error) {
+                console.error('Error al conectar con la IA:', error);
+                
+                // Fallback a análisis local
+                if (userMessage.toLowerCase().match(/hola|buenos días|buenas tardes|buenas noches|hey|saludos|qué tal/)) {
+                    return '¡Hola! 👋 Es un placer ayudarte. Cuéntame, ¿qué síntomas o molestias estás experimentando? Así podré recomendarte la especialidad médica más adecuada.';
+                }
+                
+                const specialty = analyzeLocalSymptoms(userMessage);
+                
+                if (specialty) {
+                    return `Según los síntomas que describes, te recomiendo la especialidad de **${specialty}** ${SPECIALTIES[specialty].emoji}. ¿Te gustaría que la seleccione automáticamente para tu reserva?`;
+                }
+                
+                return '🤔 Para poder ayudarte mejor, ¿podrías describir con más detalle qué molestias o síntomas estás experimentando? Por ejemplo: dolor, fiebre, malestar en alguna zona específica, etc.';
+            }
+        }
+
+        async function sendMessage() {
+            if (isProcessing) return;
+            
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            isProcessing = true;
+            input.value = '';
+            input.disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            
+            // Agregar mensaje del usuario
+            addMessageToChat('user', message);
+            conversationHistory.push({ role: 'user', content: message });
+            
+            // Mostrar indicador de escritura
+            showTypingIndicator();
+            
+            try {
+                // Enviar a la IA
+                const botResponse = await sendToAI(message);
+                
+                // Quitar indicador
+                removeTypingIndicator();
+                
+                // Agregar respuesta del bot
+                addMessageToChat('assistant', botResponse);
+                conversationHistory.push({ role: 'assistant', content: botResponse });
+                
+                // Detectar especialidad recomendada
+                const recommendedSpecialty = Object.keys(SPECIALTIES).find(spec => 
+                    botResponse.includes(spec)
+                );
+                
+                if (recommendedSpecialty) {
+                    setTimeout(() => {
+                        addMessageToChat('assistant', '', true, recommendedSpecialty);
+                    }, 500);
+                }
+                
+            } catch (error) {
+                removeTypingIndicator();
+                addMessageToChat('assistant', '😔 Lo siento, tuve un problema técnico. ¿Podrías repetir tu consulta?');
+            } finally {
+                isProcessing = false;
+                input.disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                input.focus();
+            }
+        }
+
+        // FUNCIONES ADICIONALES
+        
+        // Función para cerrar el modal de éxito
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        // Función para manejar archivos seleccionados
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            if (files.length === 0) return;
+            
+            Array.from(files).forEach((file, index) => {
+                // Validar tamaño (5MB máximo)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`El archivo "${file.name}" excede el tamaño máximo de 5MB`);
+                    return;
+                }
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200';
+                fileItem.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">${file.name}</p>
+                            <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(1)} KB</p>
+                        </div>
+                    </div>
+                    <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        // Función para eliminar archivo
+        function removeFile(index) {
+            const input = document.getElementById('patientFiles');
+            const dt = new DataTransfer();
+            const { files } = input;
+            
+            for (let i = 0; i < files.length; i++) {
+                if (i !== index) dt.items.add(files[i]);
+            }
+            
+            input.files = dt.files;
+            handleFileSelect({ target: input });
+        }
+
+        // INICIALIZAR
+        generateWeekDays();
+    </script>
+</body>
+</html>

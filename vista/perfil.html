@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil - Cita Eficiente</title>
+  <link rel="icon" type="image/x-icon" href="img/ucvitoFut.ico">
+  
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/agendarcita.css">
+  <link rel="stylesheet" href="css/perfil.css">
+</head>
+<body>
+  
+  <!-- Header con sistema de autenticación (igual que agendarcita.html) -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-container">
+          <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 5L20 35M5 20L35 20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2.5" fill="none"/>
+          </svg>
+          <div class="logo-text">
+            <span class="logo-name">Cita Eficiente</span>
+            <div class="numeros">
+              <span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>4</span><span>6</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="main-nav">
+        <a href="agendarcita.html" class="nav-link">INICIO</a>
+        <a href="reserva.html" class="nav-link">RESERVA</a>
+        <a href="historial.html" class="nav-link">HISTORIAL</a>
+        <a href="#" class="nav-link">SERVICIOS</a>
+        <a href="agendaSemanal.html" class="nav-link">DASHBOARD</a>
+        
+        <!-- Login/Profile Section -->
+        <div class="auth-section" id="auth-section">
+          <a href="index.html" class="btn-login" id="btn-login">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+              <polyline points="10 17 15 12 10 7"/>
+              <line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+            <span>LOGIN</span>
+          </a>
+          
+          <div class="user-menu" id="user-menu" style="display: none;">
+            <button class="user-menu-trigger" id="user-menu-trigger">
+              <div class="user-avatar" id="user-avatar">
+                <span id="user-initials">US</span>
+              </div>
+              <div class="user-info">
+                <span class="user-name" id="user-name">Usuario</span>
+                <span class="user-role" id="user-role-badge">Paciente</span>
+              </div>
+              <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            
+            <div class="user-dropdown" id="user-dropdown">
+              <div class="dropdown-header">
+                <div class="dropdown-avatar" id="dropdown-avatar">
+                  <span id="dropdown-initials">US</span>
+                </div>
+                <div class="dropdown-info">
+                  <span class="dropdown-name" id="dropdown-name">Usuario</span>
+                  <span class="dropdown-email" id="dropdown-email">usuario@email.com</span>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <a href="perfil.html" class="dropdown-item active">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Mi Perfil
+              </a>
+              <a href="#" class="dropdown-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Configuración
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item logout-btn" id="btn-logout">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="profile-container">
+    
+    <!-- Header de página -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Mi Perfil</h1>
+        <p>Gestiona tu información personal y configuración de cuenta</p>
+      </div>
+      <div class="page-header-right">
+        <span class="status-badge active" id="status-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22,4 12,14.01 9,11.01"/>
+          </svg>
+          <span id="status-text">Activo</span>
+        </span>
+        <button class="btn-edit-profile" id="btn-toggle-edit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          <span>Editar Perfil</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tarjeta Hero del Perfil -->
+    <div class="profile-hero">
+      <div class="profile-hero-content">
+        <div class="profile-avatar-wrapper">
+          <div class="profile-avatar">
+            <img src="" alt="Avatar" id="profile-avatar-img" style="display: none;">
+            <span class="profile-avatar-initials" id="profile-initials">US</span>
+          </div>
+          <label class="avatar-edit-btn" title="Cambiar foto">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <input type="file" accept="image/*" id="avatar-input">
+          </label>
+        </div>
+        <div class="profile-info">
+          <h2 id="profile-fullname">Cargando...</h2>
+          <p class="profile-role" id="profile-role">Paciente</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="stat-value" id="stat-citas">0</div>
+        <div class="stat-label">Citas Totales</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22,4 12,14.01 9,11.01"/>
+          </svg>
+        </div>
+        <div class="stat-value" id="stat-completadas">0</div>
+        <div class="stat-label">Citas Completadas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12,6 12,12 16,14"/>
+          </svg>
+        </div>
+        <div class="stat-value" id="stat-pendientes">0</div>
+        <div class="stat-label">Citas Pendientes</div>
+      </div>
+    </div>
+
+    <!-- Grid de información -->
+    <div class="profile-grid">
+      
+      <!-- Información Personal -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <h3>Información Personal</h3>
+        </div>
+        <div class="info-card-body">
+          <div id="alert-personal" style="display: none;"></div>
+          <form id="form-personal">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nombres">Nombres</label>
+                <input type="text" id="nombres" name="nombres" placeholder="Tus nombres" disabled>
+              </div>
+              <div class="form-group">
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" name="apellidos" placeholder="Tus apellidos" disabled>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dni">DNI</label>
+                <input type="text" id="dni" name="dni" placeholder="12345678" disabled readonly>
+              </div>
+              <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="tel" id="telefono" name="telefono" placeholder="+51 999 999 999" disabled>
+              </div>
+            </div>
+            <div class="form-actions" id="actions-personal" style="display: none;">
+              <button type="button" class="btn btn-secondary" id="btn-cancel-personal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17,21 17,13 7,13 7,21"/>
+                  <polyline points="7,3 7,8 15,8"/>
+                </svg>
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Información de Contacto -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <h3>Información de Contacto</h3>
+        </div>
+        <div class="info-card-body">
+          <div id="alert-contact" style="display: none;"></div>
+          <form id="form-contact">
+            <div class="form-row full-width">
+              <div class="form-group">
+                <label for="email">Correo Electrónico</label>
+                <input type="email" id="email" name="email" placeholder="tu@email.com" disabled>
+              </div>
+            </div>
+            <div class="form-row full-width">
+              <div class="form-group">
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" name="direccion" placeholder="Tu dirección" disabled>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ciudad">Ciudad</label>
+                <input type="text" id="ciudad" name="ciudad" placeholder="Lima" disabled>
+              </div>
+              <div class="form-group">
+                <label for="distrito">Distrito</label>
+                <input type="text" id="distrito" name="distrito" placeholder="Miraflores" disabled>
+              </div>
+            </div>
+            <div class="form-actions" id="actions-contact" style="display: none;">
+              <button type="button" class="btn btn-secondary" id="btn-cancel-contact">Cancelar</button>
+              <button type="submit" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17,21 17,13 7,13 7,21"/>
+                  <polyline points="7,3 7,8 15,8"/>
+                </svg>
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Cambiar Contraseña -->
+      <div class="info-card password-section">
+        <div class="info-card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <h3>Cambiar Contraseña</h3>
+        </div>
+        <div class="info-card-body">
+          <div id="alert-password" style="display: none;"></div>
+          <form id="form-password">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password-actual">Contraseña Actual</label>
+                <input type="password" id="password-actual" name="password_actual" placeholder="••••••••" minlength="8">
+              </div>
+              <div class="form-group">
+                <label for="password-nueva">Nueva Contraseña</label>
+                <input type="password" id="password-nueva" name="password_nueva" placeholder="••••••••" minlength="8">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password-confirmar">Confirmar Nueva Contraseña</label>
+                <input type="password" id="password-confirmar" name="password_confirmar" placeholder="••••••••" minlength="8">
+              </div>
+              <div class="form-group">
+                <div class="password-requirements">
+                  <h4>Requisitos de contraseña:</h4>
+                  <ul>
+                    <li id="req-length">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                      </svg>
+                      Mínimo 8 caracteres
+                    </li>
+                    <li id="req-upper">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                      </svg>
+                      Una letra mayúscula
+                    </li>
+                    <li id="req-number">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                      </svg>
+                      Un número
+                    </li>
+                    <li id="req-match">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                      </svg>
+                      Las contraseñas coinciden
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="btn-change-password">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Cambiar Contraseña
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/perfil.js"></script>
+  <script>
+    // Sistema de autenticación integrado (igual que en agendarcita.html)
+    document.addEventListener('DOMContentLoaded', function() {
+      // Verificar autenticación
+      function checkAuth() {
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        
+        if (!user || !user.dni) {
+          // No hay sesión - redirigir al login
+          window.location.href = 'index.html';
+          return;
+        }
+
+        const btnLogin = document.getElementById('btn-login');
+        const userMenu = document.getElementById('user-menu');
+
+        if (btnLogin) btnLogin.style.display = 'none';
+        if (userMenu) {
+          userMenu.style.display = 'block';
+          
+          const initials = `${user.nombres?.charAt(0) || ''}${user.apellidos?.charAt(0) || ''}`.toUpperCase();
+          
+          document.getElementById('user-initials').textContent = initials;
+          document.getElementById('user-name').textContent = `${user.nombres || ''} ${user.apellidos || ''}`.trim();
+          document.getElementById('user-role-badge').textContent = user.rol === 'admin' ? 'Administrador' : 'Paciente';
+          
+          document.getElementById('dropdown-initials').textContent = initials;
+          document.getElementById('dropdown-name').textContent = `${user.nombres || ''} ${user.apellidos || ''}`.trim();
+          document.getElementById('dropdown-email').textContent = user.email || '';
+        }
+      }
+
+      // Toggle dropdown
+      const userMenuTrigger = document.getElementById('user-menu-trigger');
+      const userDropdown = document.getElementById('user-dropdown');
+
+      if (userMenuTrigger && userDropdown) {
+        userMenuTrigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          userDropdown.classList.toggle('show');
+          userMenuTrigger.classList.toggle('active');
+        });
+
+        document.addEventListener('click', function(e) {
+          if (!userMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+            userDropdown.classList.remove('show');
+            userMenuTrigger.classList.remove('active');
+          }
+        });
+      }
+
+      // Logout
+      const btnLogout = document.getElementById('btn-logout');
+      if (btnLogout) {
+        btnLogout.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+            localStorage.removeItem('user');
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+          }
+        });
+      }
+
+      checkAuth();
+    });
+  </script>
+</body>
+</html>

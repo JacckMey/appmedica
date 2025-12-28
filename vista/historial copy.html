@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial Clínico - Hospital Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .table-row {
+            transition: all 0.2s;
+        }
+        .table-row:hover {
+            background-color: #f0f9ff;
+            transform: scale(1.01);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 text-white shadow-lg mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">📋 Historial Clínico de Pacientes</h1>
+                    <p class="text-blue-100 mt-2">Sistema de gestión de registros médicos</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-blue-100">Total de Registros</p>
+                    <p class="text-3xl font-bold" id="totalPatients">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje de estado -->
+        <div id="statusMessage" class="hidden mb-6"></div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="bg-white rounded-3xl shadow-lg p-6 mb-6">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                Filtros de Búsqueda
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">🔍 Buscar Paciente</label>
+                    <input 
+                        type="text" 
+                        id="searchName" 
+                        placeholder="Nombre, apellido o DNI..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onkeyup="filterTable()"
+                    >
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">🏥 Especialidad</label>
+                    <select 
+                        id="filterSpecialty" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onchange="filterTable()"
+                    >
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">👨‍⚕️ Doctor</label>
+                    <select 
+                        id="filterDoctor" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onchange="filterTable()"
+                    >
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">📅 Fecha</label>
+                    <input 
+                        type="date" 
+                        id="filterDate" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onchange="filterTable()"
+                    >
+                </div>
+            </div>
+
+            <div class="mt-4 flex gap-3">
+                <button 
+                    onclick="clearFilters()" 
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-colors"
+                >
+                    🔄 Limpiar Filtros
+                </button>
+                <button 
+                    onclick="cargarDatos()" 
+                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors"
+                >
+                    ♻️ Recargar Datos
+                </button>
+                <button 
+                    onclick="exportToCSV()" 
+                    class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-colors"
+                >
+                    📊 Exportar a Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de Pacientes -->
+        <div class="bg-white rounded-3xl shadow-lg p-6 overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b-2 border-gray-200">
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">ID</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">DNI</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Paciente</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Edad</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Especialidad</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Doctor</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Última Cita</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Total Citas</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Estado</th>
+                        <th class="text-center p-4 text-xs font-bold text-gray-600 uppercase">Detalle</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="10" class="text-center p-8">
+                            <div class="loading mx-auto mb-3"></div>
+                            <p class="text-gray-500">Cargando datos...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal de Detalle -->
+        <div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let historialDB = [];
+        let filteredData = [];
+
+        // CARGAR DATOS DEL SERVIDOR
+        async function cargarDatos() {
+            try {
+                showStatus('Cargando datos del servidor...', 'info');
+                
+               const response = await fetch("http://localhost:3000/historial/datos");
+
+
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+
+                if (result.success) {
+                   historialDB = result.datos;  // ← AQUÍ SE ARRE
+                    filteredData = historialDB;
+                    
+                    showStatus(`✅ ${result.total} registros cargados correctamente`, 'success');
+                    llenarFiltros();
+                    renderTable(historialDB);
+                } else {
+                    showStatus('❌ Error: ' + result.mensaje, 'error');
+                    renderEmptyTable('Error al cargar datos');
+                }
+            } catch (error) {
+                console.error('Error completo:', error);
+                showStatus('❌ No se pudo conectar con el servidor', 'error');
+                renderEmptyTable('No se pudo conectar con el servidor');
+            }
+        }
+
+        // MOSTRAR MENSAJES DE ESTADO
+        function showStatus(mensaje, tipo) {
+            const statusDiv = document.getElementById('statusMessage');
+            const colors = {
+                info: 'bg-blue-100 text-blue-800 border-blue-300',
+                success: 'bg-green-100 text-green-800 border-green-300',
+                error: 'bg-red-100 text-red-800 border-red-300'
+            };
+            
+            statusDiv.className = `p-4 rounded-xl border-2 ${colors[tipo] || colors.info}`;
+            statusDiv.textContent = mensaje;
+            statusDiv.classList.remove('hidden');
+            
+            if (tipo === 'success') {
+                setTimeout(() => statusDiv.classList.add('hidden'), 3000);
+            }
+        }
+
+        // LLENAR FILTROS
+        function llenarFiltros() {
+            const especialidades = [...new Set(historialDB.map(h => h.especialidad).filter(Boolean))];
+            const doctores = [...new Set(historialDB.map(h => h.doctor).filter(Boolean))];
+            
+            document.getElementById('filterSpecialty').innerHTML = '<option value="">Todas</option>' + 
+                especialidades.map(e => `<option value="${e}">${e}</option>`).join('');
+            
+            document.getElementById('filterDoctor').innerHTML = '<option value="">Todos</option>' + 
+                doctores.map(d => `<option value="${d}">${d}</option>`).join('');
+        }
+
+        // FORMATEAR FECHA
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('es-ES', options);
+        }
+
+        // RENDERIZAR TABLA VACÍA
+        function renderEmptyTable(mensaje) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="text-center p-8">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="text-gray-500 font-semibold">${mensaje}</p>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('totalPatients').textContent = '0';
+        }
+
+        // RENDERIZAR TABLA
+        function renderTable(data = historialDB) {
+            const tbody = document.getElementById('tableBody');
+            document.getElementById('totalPatients').textContent = data.length;
+            
+            if (data.length === 0) {
+                renderEmptyTable('No hay registros');
+                return;
+            }
+
+            tbody.innerHTML = data.map(registro => {
+                const statusColor = registro.estado === 'Activo' ? 'green' : 
+                                   registro.estado === 'En tratamiento' ? 'yellow' : 'blue';
+                
+                return `
+                    <tr class="table-row border-b border-gray-100">
+                        <td class="p-4">
+                            <span class="font-mono text-sm font-semibold text-blue-600">${registro.paciente_id}</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="font-mono text-xs text-gray-600">${registro.paciente_dni}</span>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${registro.paciente_dni}" 
+                                     class="w-10 h-10 rounded-full bg-gray-100">
+                                <div>
+                                    <p class="font-semibold text-gray-800">${registro.nombre_completo}</p>
+                                    <p class="text-xs text-gray-500">${registro.genero}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="text-gray-700">${registro.edad} años</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                                ${registro.especialidad}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-sm font-medium text-gray-700">${registro.doctor}</p>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-sm text-gray-600">${formatDate(registro.fecha_ultima_cita)}</p>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                                ${registro.total_citas}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 bg-${statusColor}-100 text-${statusColor}-700 rounded-full text-xs font-semibold">
+                                ${registro.estado}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <button onclick='showDetail(${JSON.stringify(registro).replace(/'/g, "&apos;")})' 
+                                    class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors mx-auto block">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // FILTRAR TABLA
+        function filterTable() {
+            const searchName = document.getElementById('searchName').value.toLowerCase();
+            const filterSpecialty = document.getElementById('filterSpecialty').value;
+            const filterDoctor = document.getElementById('filterDoctor').value;
+            const filterDate = document.getElementById('filterDate').value;
+
+            filteredData = historialDB.filter(registro => {
+                const matchName = 
+                    registro.nombre_completo.toLowerCase().includes(searchName) ||
+                    registro.paciente_dni.includes(searchName);
+                
+                const matchSpecialty = !filterSpecialty || registro.especialidad === filterSpecialty;
+                const matchDoctor = !filterDoctor || registro.doctor === filterDoctor;
+                const matchDate = !filterDate || registro.fecha_ultima_cita === filterDate;
+
+                return matchName && matchSpecialty && matchDoctor && matchDate;
+            });
+
+            renderTable(filteredData);
+        }
+
+        // LIMPIAR FILTROS
+        function clearFilters() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('filterSpecialty').value = '';
+            document.getElementById('filterDoctor').value = '';
+            document.getElementById('filterDate').value = '';
+            filteredData = historialDB;
+            renderTable(historialDB);
+        }
+
+        // MOSTRAR DETALLE
+        function showDetail(registro) {
+            const modal = document.getElementById('modalDetail');
+            const content = document.getElementById('modalContent');
+
+            content.innerHTML = `
+                <div class="p-8">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center gap-4">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${registro.paciente_dni}" 
+                                 class="w-20 h-20 rounded-2xl bg-gray-100">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">${registro.nombre_completo}</h2>
+                                <p class="text-gray-500">DNI: ${registro.paciente_dni} • ${registro.edad} años • ${registro.genero}</p>
+                                <span class="inline-block mt-2 px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm font-semibold">
+                                    ${registro.especialidad}
+                                </span>
+                            </div>
+                        </div>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">✕</button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
+                            <h4 class="font-bold text-blue-800 mb-3">📋 Datos Básicos</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-blue-600">Tipo de Sangre:</span>
+                                    <span class="font-bold text-blue-900">${registro.tipo_sangre}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-blue-600">Teléfono:</span>
+                                    <span class="font-bold text-blue-900">${registro.telefono || 'N/A'}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-blue-600">Email:</span>
+                                    <span class="font-bold text-blue-900 text-xs">${registro.email || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+                            <h4 class="font-bold text-purple-800 mb-3">📊 Signos Vitales</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-purple-600">Presión:</span>
+                                    <span class="font-bold text-purple-900">${registro.presion_arterial || 'N/A'}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-purple-600">Temperatura:</span>
+                                    <span class="font-bold text-purple-900">${registro.temperatura ? registro.temperatura + '°C' : 'N/A'}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-purple-600">Peso:</span>
+                                    <span class="font-bold text-purple-900">${registro.peso ? registro.peso + ' kg' : 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${registro.diagnostico ? `
+                    <div class="bg-red-50 rounded-xl p-5 mb-4 border-l-4 border-red-500">
+                        <h4 class="font-bold text-red-800 mb-2">🏥 Diagnóstico</h4>
+                        <p class="text-red-900 font-semibold">${registro.diagnostico}</p>
+                    </div>
+                    ` : ''}
+
+                    ${registro.tratamiento ? `
+                    <div class="bg-green-50 rounded-xl p-5 mb-4 border-l-4 border-green-500">
+                        <h4 class="font-bold text-green-800 mb-2">💚 Tratamiento</h4>
+                        <p class="text-green-900">${registro.tratamiento}</p>
+                    </div>
+                    ` : ''}
+
+                    ${registro.medicamentos ? `
+                    <div class="bg-blue-50 rounded-xl p-5 mb-4 border-l-4 border-blue-500">
+                        <h4 class="font-bold text-blue-800 mb-2">💊 Medicamentos</h4>
+                        <p class="text-blue-900">${registro.medicamentos}</p>
+                    </div>
+                    ` : ''}
+
+                    ${registro.alergias ? `
+                    <div class="bg-yellow-50 rounded-xl p-5 mb-4 border-l-4 border-yellow-500">
+                        <h4 class="font-bold text-yellow-800 mb-2">⚠️ Alergias</h4>
+                        <p class="text-yellow-900 font-bold">${registro.alergias}</p>
+                    </div>
+                    ` : ''}
+
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="closeModal()" 
+                                class="flex-1 px-6 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-4 rounded-xl transition-colors">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modalDetail').classList.add('hidden');
+        }
+
+        // EXPORTAR CSV
+        function exportToCSV() {
+            if (filteredData.length === 0) {
+                alert('No hay datos para exportar');
+                return;
+            }
+
+            let csv = "ID,DNI,Paciente,Edad,Género,Especialidad,Doctor,Última Cita,Total Citas,Estado\n";
+            
+            filteredData.forEach(r => {
+                csv += `"${r.paciente_id}","${r.paciente_dni}","${r.nombre_completo}","${r.edad}","${r.genero}","${r.especialidad}","${r.doctor}","${r.fecha_ultima_cita}","${r.total_citas}","${r.estado}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `historial_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        // INICIALIZAR
+        document.addEventListener('DOMContentLoaded', cargarDatos);
+    </script>
+</body>
+</html>

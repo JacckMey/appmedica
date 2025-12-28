@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cita Eficiente - Inicio</title>
+  <link rel="icon" type="image/x-icon" href="img/ucvitoFut.ico">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/agendarcita.css">
+  
+  <style>
+    /* Ajuste para el navbar fixed */
+    body.has-navbar .hero {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body class="has-navbar">
+  
+  <!-- El navbar se carga dinámicamente aquí -->
+  <div id="navbar-wrapper"></div>
+
+  <section class="hero">
+    <div class="overlay">
+      <h2>Agendar cita</h2>
+      <p>
+        ¿Necesitas atención médica? Agenda tu cita con nosotros de forma
+        rápida y sencilla. Olvídate de las largas esperas en la sala de
+        espera. Desde la comodidad de tu hogar, puedes programar tu consulta y
+        recibir la atención que necesitas. Optimizamos tu tiempo y tu
+        bienestar.
+      </p>
+      <button class="btn-blue" onclick="handleAgendarClick()">Agendar</button>
+    </div>
+  </section>
+
+  <section class="basic-services">
+    <h2>Servicios básicos</h2>
+    <div class="services-container">
+      <div class="service-card">
+        <h3>Citas médicas</h3>
+        <p>
+          Cita Eficiente ofrece tecnología para el diagnóstico y tratamiento
+          de enfermedades del corazón. Nuestro equipo médico especializado
+          está aquí para brindarte la atención que necesitas.
+        </p>
+        <button class="btn-blue">Leer más</button>
+      </div>
+      <div class="service-card">
+        <h3>Medicamentos</h3>
+        <p>
+          Ofrecemos medicamentos de cardiología para el diagnóstico y
+          tratamiento de enfermedades del corazón. Nuestro equipo médico
+          especializado está aquí para brindarte la atención que necesitas.
+        </p>
+        <button class="btn-blue">Leer más</button>
+      </div>
+      <div class="service-card">
+        <h3>Exámenes médicos</h3>
+        <p>
+          En Cita Eficiente, ofrecemos servicios de exámenes médicos para el
+          diagnóstico y tratamiento de tus dolencias.
+        </p>
+        <button class="btn-blue">Leer más</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="book-online">
+    <h2>Reservar tu cita en línea</h2>
+    <button class="btn-blue" onclick="handleReservarClick()">Reservar una cita</button>
+  </section>
+
+  <section class="newsletter">
+    <h2>Recibe nuestras últimas noticias</h2>
+    <p>
+      Suscríbete a nuestro boletín para recibir las últimas noticias, consejos
+      de salud y actualizaciones sobre nuestros servicios
+    </p>
+    <form onsubmit="handleNewsletterSubmit(event)">
+      <input type="email" placeholder="Ingresa tu correo electrónico aquí" required />
+      <button type="submit" class="btn-blue">Suscribirte</button>
+    </form>
+  </section>
+
+  <footer>
+    <div>© 2025 Cita Eficiente</div>
+    <div>
+      <a href="#">Términos y Condiciones</a>
+      <a href="#">Política de Privacidad</a>
+      <a href="#" style="margin-left: 20px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+      </a>
+      <a href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/navbar.js"></script>
+  <script>
+    // Manejar clic en "Agendar"
+    function handleAgendarClick() {
+      if (isUserLoggedIn()) {
+        window.location.href = 'reserva.html';
+      } else {
+        alert('Debes iniciar sesión para agendar una cita');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Manejar clic en "Reservar"
+    function handleReservarClick() {
+      if (isUserLoggedIn()) {
+        window.location.href = 'reserva.html';
+      } else {
+        alert('Debes iniciar sesión para reservar una cita');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Manejar suscripción al newsletter
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const email = e.target.querySelector('input[type="email"]').value;
+      alert(`¡Gracias por suscribirte! Te enviaremos noticias a: ${email}`);
+      e.target.reset();
+    }
+  </script>
+</body>
+</html>

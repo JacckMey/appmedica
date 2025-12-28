@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Especialidades - Sistema Hospitalario</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #7db2f8 0%, #0d1bdd 100%);
+        min-height: 100vh;
+        padding-bottom: 50px;
+      }
+
+      nav {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1.2rem 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+      }
+
+      nav a {
+        color: #4a5568;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        letter-spacing: 0.5px;
+      }
+
+      nav a:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 3rem auto;
+        padding: 0 2rem;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 3rem;
+        color: white;
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .service-card {
+        background: white;
+        border-radius: 16px;
+        overflow: visible; /* ✔ ICONO YA NO SE CORTA */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        transition: all 0.4s ease;
+        position: relative;
+      }
+
+      .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .service-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        position: relative;
+      }
+
+      .service-icon {
+        position: absolute;
+        bottom: -25px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+background: #2f80ed;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(5, 30, 146, 0.4);
+        z-index: 10;
+      }
+
+      .service-icon svg {
+        width: 26px;
+        height: 26px;
+        fill: white;
+      }
+
+      .service-content {
+        padding: 2.5rem 1.5rem 1.5rem;
+      }
+
+      .service-content h3 {
+        color: #2d3748;
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+      }
+
+      .service-content p {
+        color: #718096;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+      }
+
+      .learn-more {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+      }
+
+      .learn-more:hover {
+        gap: 0.8rem;
+        color: #764ba2;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="#">INICIO</a>
+      <a href="#RESERVA">RESERVA</a>
+      <a href="historial.html">HISTORIAL</a>
+      <a
+        href="#"
+        style="
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        "
+        >ESPECIALIDADES</a
+      >
+      <a href="#">CATEGORÍAS</a>
+      <a href="agendaSemanal.html">DASHBOARD</a>
+    </nav>
+
+    <div class="container">
+      <div class="header">
+
+        
+        <h1>Especialidades Médicas</h1>
+        <p>Atención completa para tu salud y bienestar</p>
+      </div>
+
+      <div class="services-grid">
+        <!-- MEDICINA GENERAL -->
+        <div class="service-card">
+          <img
+            src="https://images.unsplash.com/photo-1580281657521-94bb6a405c45?w=600&h=400&fit=crop"
+            class="service-image"
+          />
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M10 2V4H14V2H16V4H18C19.1 4 20 4.9 20 6V20C20 21.1 19.1 22 18 22H6C4.89 22 4 21.1 4 20V6C4 4.9 4.89 4 6 4H8V2H10M12 12C10.34 12 9 13.34 9 15S10.34 18 12 18 15 16.66 15 15 13.66 12 12 12Z"
+              />
+            </svg>
+          </div>
+          <div class="service-content">
+            <h3>Medicina General</h3>
+            <p>
+              Atención integral para pacientes de todas las edades, diagnóstico
+              clínico y seguimiento continuo.
+            </p>
+            <a href="#" class="learn-more">Conocer más</a>
+          </div>
+        </div>
+
+        <!-- PEDIATRÍA -->
+        <div class="service-card">
+          <img
+            src="https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=600&h=400&fit=crop"
+            class="service-image"
+          />
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 2A5 5 0 0 1 17 7C17 9.38 15.26 11.44 13 12V14H15A4 4 0 0 1 19 18V20H5V18A4 4 0 0 1 9 14H11V12C8.74 11.44 7 9.38 7 7A5 5 0 0 1 12 2Z"
+              />
+            </svg>
+          </div>
+          <div class="service-content">
+            <h3>Pediatría</h3>
+            <p>
+              Control de crecimiento, vacunación y cuidado especializado para
+              niños y adolescentes.
+            </p>
+            <a href="#" class="learn-more">Conocer más</a>
+          </div>
+        </div>
+
+        <!-- CARDIOLOGÍA -->
+        <div class="service-card">
+          <img
+            src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600&h=400&fit=crop"
+            class="service-image"
+          />
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12.1 18.55L10.55 17.03C5.4 12.36 2 9.28 2 6.5C2 4.5 3.5 3 5.5 3C6.74 3 7.92 3.54 8.7 4.46L12 8.35L15.3 4.46C16.08 3.54 17.26 3 18.5 3C20.5 3 22 4.5 22 6.5C22 9.28 18.6 12.36 13.45 17.04L12.1 18.55Z"
+              />
+            </svg>
+          </div>
+          <div class="service-content">
+            <h3>Cardiología</h3>
+            <p>
+              Evaluación del corazón, control de hipertensión, arritmias y
+              prevención de enfermedades cardiovasculares.
+            </p>
+            <a href="#" class="learn-more">Conocer más</a>
+          </div>
+        </div>
+
+        <!-- NEUROLOGÍA -->
+        <div class="service-card">
+          <img
+            src="https://images.unsplash.com/photo-1559757175-5700dde67548?w=600&h=400&fit=crop"
+            class="service-image"
+          />
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12,2A7,7 0 0,1 19,9C19,11.05 18.21,13.15 16.78,14.59L12,19.41L7.22,14.63C5.79,13.19 5,11.09 5,9A7,7 0 0,1 12,2Z"
+              />
+            </svg>
+          </div>
+          <div class="service-content">
+            <h3>Neurología</h3>
+            <p>
+              Atención especializada en migrañas, epilepsia, neuropatías y
+              trastornos del sistema nervioso.
+            </p>
+            <a href="#" class="learn-more">Conocer más</a>
+          </div>
+        </div>
+
+        <!-- GASTROENTEROLOGÍA -->
+        <div class="service-card">
+          <img
+            src="https://images.unsplash.com/photo-1580910051074-2c6498ec7f93?w=600&h=400&fit=crop"
+            class="service-image"
+          />
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M14 2C10.69 2 8 4.69 8 8V18A4 4 0 0 0 12 22A4 4 0 0 0 16 18V12H18V10H16V8C16 6.3 17.3 5 19 5V3C16.76 3 15 4.76 15 7V10H14V2Z"
+              />
+            </svg>
+          </div>
+          <div class="service-content">
+            <h3>Gastroenterología</h3>
+            <p>
+              Diagnóstico y tratamiento del sistema digestivo: gastritis,
+              reflujo, colon irritable y más.
+            </p>
+            <a href="#" class="learn-more">Conocer más</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

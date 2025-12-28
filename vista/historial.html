@@ -1,108 +1,505 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Historial de Pacientes</title>
-  <link rel="stylesheet" href="./css/historial.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial Clínico - Hospital Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .table-row {
+            transition: all 0.2s;
+        }
+        .table-row:hover {
+            background-color: #f0f9ff;
+            transform: scale(1.01);
+        }
+    </style>
 </head>
-<body>
-  <!-- CABECERA -->
-  <header class="top-header">
-    <div class="brand">
-      <h1>Cita Eficiente</h1>
-      <div class="counter">
-        <span>0</span><span>0</span><span>0</span><span>0</span><span>4</span><span>6</span>
-      </div>
-    </div>
-    <nav class="nav-links">
-      <a href="#">INICIO</a>
-      <a href="#">FORMULARIO</a>
-      <a href="#">ACERCA DE</a>
-      <a href="#">SERVICIOS</a>
-    </nav>
-  </header>
+<body class="bg-gray-50 p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 text-white shadow-lg mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">📋 Historial Clínico de Pacientes</h1>
+                    <p class="text-blue-100 mt-2">Sistema de gestión de registros médicos</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-blue-100">Total de Pacientes</p>
+                    <p class="text-3xl font-bold" id="totalPatients">0</p>
+                </div>
+            </div>
+        </div>
 
-  <div class="container">
-    <div class="header">
-      <div class="logo">PM</div>
-      <div class="header-info">
-        <h1>Historial de Pacientes</h1>
-        <p class="lead">Registros clínicos recientes del Policlínico</p>
-      </div>
+        <!-- Filtros y Búsqueda -->
+        <div class="bg-white rounded-3xl shadow-lg p-6 mb-6">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                Filtros de Búsqueda
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <!-- Búsqueda por nombre/apellido -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">🔍 Buscar Paciente</label>
+                    <input 
+                        type="text" 
+                        id="searchName" 
+                        placeholder="Nombre o apellido..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onkeyup="filterTable()"
+                    >
+                </div>
+
+                <!-- Filtro por Especialidad -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">🏥 Especialidad</label>
+                    <select 
+                        id="filterSpecialty" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onchange="filterTable()"
+                    >
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Estado -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">📊 Estado</label>
+                    <select 
+                        id="filterStatus" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onchange="filterTable()"
+                    >
+                        <option value="">Todos</option>
+                        <option value="Activo">Activo</option>
+                        <option value="En tratamiento">En tratamiento</option>
+                        <option value="Recuperación">Recuperación</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Edad -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">👤 Rango de Edad</label>
+                    <select 
+                        id="filterAge" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onchange="filterTable()"
+                    >
+                        <option value="">Todas las edades</option>
+                        <option value="0-18">0-18 años</option>
+                        <option value="19-30">19-30 años</option>
+                        <option value="31-45">31-45 años</option>
+                        <option value="46-60">46-60 años</option>
+                        <option value="61+">61+ años</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Fecha -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 mb-2 block">📅 Última Cita</label>
+                    <input 
+                        type="date" 
+                        id="filterDate" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        onchange="filterTable()"
+                    >
+                </div>
+            </div>
+
+            <div class="mt-4 flex gap-3">
+                <button 
+                    onclick="clearFilters()" 
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-colors"
+                >
+                    🔄 Limpiar Filtros
+                </button>
+                <button 
+                    onclick="exportToCSV()" 
+                    class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-colors"
+                >
+                    📊 Exportar a Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de Pacientes -->
+        <div class="bg-white rounded-3xl shadow-lg p-6 overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b-2 border-gray-200">
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">ID</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Paciente</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Edad</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Especialidad</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Doctor Asignado</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Última Cita</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Total Citas</th>
+                        <th class="text-left p-4 text-xs font-bold text-gray-600 uppercase">Estado</th>
+                        <th class="text-center p-4 text-xs font-bold text-gray-600 uppercase">Ver Detalle</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Contenido dinámico -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal de Detalle del Paciente -->
+        <div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div id="modalContent">
+                    <!-- Contenido dinámico -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="toolbar">
-      <input type="text" class="search-input" placeholder="Buscar paciente...">
-      <button class="btn primary" id="btnNuevo">+ Nuevo registro</button>
-      <button class="btn outline" id="btnCSV">Exportar CSV</button>
-      <button class="btn outline" id="btnPDF">Exportar PDF</button>
-    </div>
+    <script>
+        // DATOS GLOBALES
+        let patientsDB = [];
+        let allPatients = [];
 
-    <div class="table-wrapper">
-      <table class="hist-table">
-        <thead>
-          <tr>
-            <th>Paciente</th>
-            <th>Edad</th>
-            <th>Diagnóstico</th>
-            <th>Fecha</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tablaBody">
-          <tr>
-            <td><strong>Juan Pérez</strong><br><small>DNI 75234123</small></td>
-            <td>34</td>
-            <td><span class="pill">Control general</span></td>
-            <td>25/10/2025</td>
-            <td class="actions"><button class="btn view">Ver</button></td>
-          </tr>
-          <tr>
-            <td><strong>María López</strong><br><small>DNI 74892010</small></td>
-            <td>29</td>
-            <td><span class="pill">Consulta odontológica</span></td>
-            <td>22/10/2025</td>
-            <td class="actions"><button class="btn view">Ver</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+        // FORMATEAR FECHA
+        function formatDate(dateString) {
+            if (!dateString) return 'Sin registro';
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
 
-  <!-- MODAL FORMULARIO -->
-  <div class="modal" id="modalRegistro">
-    <div class="modal-content">
-      <h2 class="modal-title">Nuevo Registro</h2>
-      <form class="form-registro" id="formHistorial">
-        <div class="field-group">
-          <label>Nombre del paciente</label>
-          <input type="text" id="nombre" required>
-        </div>
-        <div class="field-group">
-          <label>DNI</label>
-          <input type="text" id="dni" required>
-        </div>
-        <div class="field-group">
-          <label>Edad</label>
-          <input type="number" id="edad" required>
-        </div>
-        <div class="field-group">
-          <label>Diagnóstico</label>
-          <input type="text" id="diagnostico" required>
-        </div>
-        <div class="field-group">
-          <label>Fecha</label>
-          <input type="date" id="fecha" required>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-cancel" id="btnCerrar">Cancelar</button>
-          <button type="submit" class="btn primary">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+        // CARGAR PACIENTES DESDE LA BD
+        async function cargarPacientes() {
+            try {
+                const response = await fetch('/api/historial/pacientes');
+                const result = await response.json();
+                
+                if (result.success) {
+                    patientsDB = result.data;
+                    allPatients = result.data;
+                    renderTable(patientsDB);
+                    await cargarEspecialidadesSelect();
+                }
+            } catch (error) {
+                console.error('❌ Error al cargar pacientes:', error);
+                alert('Error al cargar los datos de pacientes');
+            }
+        }
 
-  <script src="./js/historial.js"></script>
+        // CARGAR ESPECIALIDADES EN EL SELECT
+        async function cargarEspecialidadesSelect() {
+            try {
+                const response = await fetch('/api/historial/especialidades');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const select = document.getElementById('filterSpecialty');
+                    result.data.forEach(esp => {
+                        const option = document.createElement('option');
+                        option.value = esp.nombre;
+                        option.textContent = esp.nombre;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error al cargar especialidades:', error);
+            }
+        }
+
+        // RENDERIZAR TABLA
+        function renderTable(data = patientsDB) {
+            const tbody = document.getElementById('tableBody');
+            document.getElementById('totalPatients').textContent = data.length;
+            
+            tbody.innerHTML = data.map(patient => {
+                const statusColor = patient.estado === 'Activo' ? 'green' : 
+                                   patient.estado === 'En tratamiento' ? 'yellow' : 'blue';
+                
+                return `
+                    <tr class="table-row border-b border-gray-100">
+                        <td class="p-4">
+                            <span class="font-mono text-sm font-semibold text-gray-700">P${String(patient.id).padStart(3, '0')}</span>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${patient.nombre}" 
+                                     alt="${patient.nombre}" 
+                                     class="w-10 h-10 rounded-full bg-gray-100">
+                                <div>
+                                    <p class="font-semibold text-gray-800">${patient.nombre}</p>
+                                    <p class="text-xs text-gray-500">${patient.genero}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="text-gray-700">${patient.edad} años</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                                ${patient.especialidad || 'No asignada'}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-sm font-medium text-gray-700">${patient.doctor || 'No asignado'}</p>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-sm text-gray-600">${formatDate(patient.ultima_cita)}</p>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-semibold">
+                                ${patient.total_citas}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 bg-${statusColor}-100 text-${statusColor}-700 rounded-full text-xs font-semibold">
+                                ${patient.estado}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <button onclick="showQuickSummary(${patient.id})" 
+                                    class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center gap-2 mx-auto"
+                                    title="Ver resumen">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // FILTRAR TABLA
+        function filterTable() {
+            const searchName = document.getElementById('searchName').value.toLowerCase();
+            const filterSpecialty = document.getElementById('filterSpecialty').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+            const filterAge = document.getElementById('filterAge').value;
+            const filterDate = document.getElementById('filterDate').value;
+
+            const filtered = allPatients.filter(patient => {
+                const matchName = patient.nombre.toLowerCase().includes(searchName);
+                const matchSpecialty = !filterSpecialty || patient.especialidad === filterSpecialty;
+                const matchStatus = !filterStatus || patient.estado === filterStatus;
+                
+                let matchAge = true;
+                if (filterAge) {
+                    const age = patient.edad;
+                    if (filterAge === '0-18') matchAge = age <= 18;
+                    else if (filterAge === '19-30') matchAge = age >= 19 && age <= 30;
+                    else if (filterAge === '31-45') matchAge = age >= 31 && age <= 45;
+                    else if (filterAge === '46-60') matchAge = age >= 46 && age <= 60;
+                    else if (filterAge === '61+') matchAge = age >= 61;
+                }
+                
+                const matchDate = !filterDate || patient.ultima_cita === filterDate;
+
+                return matchName && matchSpecialty && matchStatus && matchAge && matchDate;
+            });
+
+            renderTable(filtered);
+        }
+
+        // LIMPIAR FILTROS
+        function clearFilters() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('filterSpecialty').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterAge').value = '';
+            document.getElementById('filterDate').value = '';
+            renderTable(allPatients);
+        }
+
+        // MOSTRAR RESUMEN RÁPIDO DEL PACIENTE
+        async function showQuickSummary(patientId) {
+            try {
+                const response = await fetch(`/api/historial/pacientes/${patientId}`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    alert('Error al cargar detalle del paciente');
+                    return;
+                }
+                
+                const patient = result.data;
+                const modal = document.getElementById('modalDetail');
+                const content = document.getElementById('modalContent');
+
+                content.innerHTML = `
+                    <div class="p-8">
+                        <div class="flex items-start justify-between mb-6">
+                            <div class="flex items-center gap-4">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${patient.nombre}" 
+                                     alt="${patient.nombre}" 
+                                     class="w-20 h-20 rounded-2xl bg-gray-100">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-800">${patient.nombre}</h2>
+                                    <p class="text-gray-500">ID: P${String(patient.id).padStart(3, '0')} • ${patient.edad} años • ${patient.genero}</p>
+                                    <span class="inline-block mt-2 px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm font-semibold">
+                                        ${patient.especialidad || 'No asignada'}
+                                    </span>
+                                </div>
+                            </div>
+                            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
+                                ✕
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
+                                <h4 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
+                                    📋 Datos Básicos
+                                </h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-600">Tipo de Sangre:</span>
+                                        <span class="font-bold text-blue-900">${patient.tipo_sangre || 'No registrado'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-600">Teléfono:</span>
+                                        <span class="font-bold text-blue-900">${patient.telefono || 'No registrado'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-600">Total Citas:</span>
+                                        <span class="font-bold text-blue-900">${patient.total_citas}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+                                <h4 class="font-bold text-purple-800 mb-3 flex items-center gap-2">
+                                    👨‍⚕️ Atención Médica
+                                </h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-purple-600">Doctor:</span>
+                                        <span class="font-bold text-purple-900">${patient.doctor || 'No asignado'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-purple-600">Última Cita:</span>
+                                        <span class="font-bold text-purple-900">${formatDate(patient.ultima_cita)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-purple-600">Estado:</span>
+                                        <span class="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs font-bold">${patient.estado}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-yellow-50 to-orange-100 rounded-xl p-5 mb-6 border-l-4 border-orange-500">
+                            <h4 class="font-bold text-orange-800 mb-3 flex items-center gap-2">
+                                ⚠️ Información Médica Importante
+                            </h4>
+                            <div class="space-y-3 text-sm">
+                                <div>
+                                    <p class="text-orange-700 font-semibold mb-1">Condiciones:</p>
+                                    <p class="text-orange-900 bg-white/50 p-2 rounded">${patient.condiciones || 'Ninguna registrada'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-red-700 font-semibold mb-1">🚫 Alergias:</p>
+                                    <p class="text-red-900 bg-white/50 p-2 rounded font-bold">${patient.alergias || 'Ninguna registrada'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-orange-700 font-semibold mb-1">💊 Medicamentos:</p>
+                                    <p class="text-orange-900 bg-white/50 p-2 rounded">${patient.medicamentos || 'Ninguno registrado'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 mb-6">
+                            <h4 class="font-bold text-green-800 mb-3 flex items-center gap-2">
+                                📅 Historial de Consultas
+                            </h4>
+                            ${patient.history && patient.history.length > 0 ? 
+                                patient.history.map(visit => `
+                                    <div class="bg-white/70 rounded-lg p-4 mb-3">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <p class="font-semibold text-green-900">${formatDate(visit.date)}</p>
+                                            <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">${visit.doctor}</span>
+                                        </div>
+                                        <p class="text-sm text-green-800 mb-1"><strong>Motivo:</strong> ${visit.reason}</p>
+                                        <p class="text-sm text-green-700"><strong>Notas:</strong> ${visit.notes || 'Sin notas'}</p>
+                                    </div>
+                                `).join('') 
+                                : '<p class="text-green-700">No hay registro de consultas</p>'}
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="downloadPDF(${patient.id})" 
+                                    class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Descargar Historial (PDF)
+                            </button>
+                            <button onclick="closeModal()" 
+                                    class="px-6 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-4 rounded-xl transition-colors">
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                modal.classList.remove('hidden');
+            } catch (error) {
+                console.error('❌ Error al mostrar detalle:', error);
+                alert('Error al cargar el detalle del paciente');
+            }
+        }
+
+        // CERRAR MODAL
+        function closeModal() {
+            document.getElementById('modalDetail').classList.add('hidden');
+        }
+
+        // DESCARGAR PDF (SIMPLIFICADO)
+        function downloadPDF(patientId) {
+            const patient = allPatients.find(p => p.id === patientId);
+            alert(`Generando PDF para ${patient.nombre}...\n\n(Implementación pendiente en el backend)`);
+        }
+
+        // EXPORTAR A CSV
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "ID,Nombre,Edad,Género,Tipo de Sangre,Especialidad,Doctor,Última Cita,Total Citas,Estado,Condiciones,Alergias,Medicamentos\n";
+            
+            allPatients.forEach(patient => {
+                const row = [
+                    `P${String(patient.id).padStart(3, '0')}`,
+                    patient.nombre,
+                    patient.edad,
+                    patient.genero,
+                    patient.tipo_sangre || '',
+                    patient.especialidad || '',
+                    patient.doctor || '',
+                    patient.ultima_cita || '',
+                    patient.total_citas,
+                    patient.estado,
+                    patient.condiciones || '',
+                    patient.alergias || '',
+                    patient.medicamentos || ''
+                ].map(field => `"${field}"`).join(',');
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `historial_pacientes_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // INICIALIZAR AL CARGAR LA PÁGINA
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarPacientes();
+        });
+    </script>
 </body>
 </html>
